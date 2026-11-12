@@ -86,14 +86,3 @@
   gap: var(--space-5);
 }
 
-.quiet {
-  color: var(--muted);
-  min-height: var(--tap);
-  padding: 0 var(--space-3);
-  font-size: var(--text-sm);
-  transition: color var(--transition);
-}
-
-.quiet:active {
-  color: var(--text);
-}

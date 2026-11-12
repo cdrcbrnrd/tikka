@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
 import { Navigate, useNavigate, useParams } from 'react-router-dom'
 import BackLink from '../components/BackLink.tsx'
 import Button from '../components/Button.tsx'
@@ -16,9 +16,11 @@ export default function Editor() {
   const { id } = useParams()
   const timers = useTimers((state) => state.timers)
   const existing = id ? timers.find((timer) => timer.id === id) : undefined
+  // a fresh id on every render would remount the form and wipe what is being typed
+  const draftId = useMemo(() => newId(), [])
 
   if (id && !existing) return <Navigate to="/" replace />
-  const initial = existing ?? blankTimer('intervals', newId())
+  const initial = existing ?? blankTimer('intervals', draftId)
   return <Form key={initial.id} initial={initial} isNew={!existing} />
 }
 
@@ -93,35 +95,29 @@ function Form({ initial, isNew }: { initial: Timer; isNew: boolean }) {
         <div className={styles.group}>
           <span className={styles.groupLabel}>Réglages</span>
           <div className={styles.fields}>
-            <Stepper
+            <Duration
               label="Préparation"
               value={draft.prepare}
               min={0}
               max={120}
               onChange={(prepare) => patch({ prepare })}
-              format={clock}
-              stepFor={durationStep}
             />
 
             {draft.kind === 'intervals' && (
               <>
-                <Stepper
+                <Duration
                   label="Effort"
                   value={draft.work}
                   min={5}
                   max={3600}
                   onChange={(work) => patch({ work })}
-                  format={clock}
-                  stepFor={durationStep}
                 />
-                <Stepper
+                <Duration
                   label="Repos"
                   value={draft.rest}
                   min={0}
                   max={3600}
                   onChange={(rest) => patch({ rest })}
-                  format={clock}
-                  stepFor={durationStep}
                 />
                 <Stepper
                   label="Séries"
@@ -129,21 +125,18 @@ function Form({ initial, isNew }: { initial: Timer; isNew: boolean }) {
                   min={1}
                   max={60}
                   onChange={(rounds) => patch({ rounds })}
-                  format={String}
                 />
               </>
             )}
 
             {draft.kind === 'emom' && (
               <>
-                <Stepper
+                <Duration
                   label="Période"
                   value={draft.period}
                   min={10}
                   max={600}
                   onChange={(period) => patch({ period })}
-                  format={clock}
-                  stepFor={durationStep}
                 />
                 <Stepper
                   label="Rounds"
@@ -151,20 +144,17 @@ function Form({ initial, isNew }: { initial: Timer; isNew: boolean }) {
                   min={1}
                   max={60}
                   onChange={(rounds) => patch({ rounds })}
-                  format={String}
                 />
               </>
             )}
 
             {draft.kind === 'countdown' && (
-              <Stepper
+              <Duration
                 label="Durée"
                 value={draft.duration}
                 min={10}
                 max={7200}
                 onChange={(duration) => patch({ duration })}
-                format={clock}
-                stepFor={durationStep}
               />
             )}
           </div>
@@ -177,12 +167,12 @@ function Form({ initial, isNew }: { initial: Timer; isNew: boolean }) {
         </Button>
         {!isNew && (
           <div className={styles.secondary}>
-            <button type="button" className={styles.quiet} onClick={duplicate}>
+            <Button variant="ghost" onClick={duplicate}>
               Dupliquer
-            </button>
-            <button type="button" className={styles.quiet} onClick={() => setAskDelete(true)}>
+            </Button>
+            <Button variant="ghost" onClick={() => setAskDelete(true)}>
               Supprimer
-            </button>
+            </Button>
           </div>
         )}
       </div>
@@ -200,6 +190,28 @@ function Form({ initial, isNew }: { initial: Timer; isNew: boolean }) {
         />
       )}
     </div>
+  )
+}
+
+type DurationProps = {
+  label: string
+  value: number
+  min: number
+  max: number
+  onChange: (value: number) => void
+}
+
+function Duration({ label, value, min, max, onChange }: DurationProps) {
+  return (
+    <Stepper
+      label={label}
+      value={value}
+      min={min}
+      max={max}
+      onChange={onChange}
+      format={clock}
+      stepFor={durationStep}
+    />
   )
 }
 
