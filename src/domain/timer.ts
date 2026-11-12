@@ -76,3 +76,47 @@ function clockShort(seconds: number): string {
   if (seconds < 60) return `${seconds} s`
   return `${Math.floor(seconds / 60)} min ${seconds % 60} s`
 }
+
+export type SegmentKind = 'prepare' | 'work' | 'rest'
+
+export type Segment = {
+  kind: SegmentKind
+  label: string
+  duration: number
+  round: number
+}
+
+export function buildSegments(timer: Timer): Segment[] {
+  const segments: Segment[] = []
+  if (timer.prepare > 0) {
+    segments.push({ kind: 'prepare', label: 'Préparation', duration: timer.prepare, round: 0 })
+  }
+
+  switch (timer.kind) {
+    case 'intervals':
+      for (let round = 1; round <= timer.rounds; round += 1) {
+        segments.push({ kind: 'work', label: 'Effort', duration: timer.work, round })
+        // the rest after the last round is dead time, the session is over
+        if (timer.rest > 0 && round < timer.rounds) {
+          segments.push({ kind: 'rest', label: 'Repos', duration: timer.rest, round })
+        }
+      }
+      break
+    case 'emom':
+      for (let round = 1; round <= timer.rounds; round += 1) {
+        segments.push({ kind: 'work', label: `Round ${round}`, duration: timer.period, round })
+      }
+      break
+    case 'countdown':
+      segments.push({ kind: 'work', label: 'En route', duration: timer.duration, round: 1 })
+      break
+    case 'stopwatch':
+      break
+  }
+
+  return segments
+}
+
+export function totalRounds(segments: Segment[]): number {
+  return segments.reduce((max, segment) => Math.max(max, segment.round), 0)
+}

@@ -1,0 +1,23 @@
+.dots {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: var(--space-2);
+}
+
+.dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--line);
+  transition: background var(--transition);
+}
+
+.done {
+  background: var(--muted);
+}
+
+.current {
+  background: var(--text);
+  box-shadow: 0 0 0 3px rgb(242 234 223 / 12%);
+}

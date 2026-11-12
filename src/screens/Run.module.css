@@ -1,0 +1,124 @@
+.screen {
+  display: flex;
+  flex-direction: column;
+  min-height: 100%;
+  padding: calc(env(safe-area-inset-top) + var(--space-4)) var(--space-4)
+    calc(env(safe-area-inset-bottom) + var(--space-5));
+}
+
+.head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  min-height: var(--tap);
+}
+
+.name {
+  font-size: var(--text-sm);
+  color: var(--muted);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.stage {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-5);
+}
+
+.phase {
+  font-size: var(--text-sm);
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.time {
+  font-size: clamp(64px, 23vw, 118px);
+  font-weight: 300;
+  line-height: 1;
+  transition: color var(--transition);
+}
+
+.urgent {
+  color: var(--accent);
+}
+
+.under {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-3);
+  min-height: 60px;
+}
+
+.nextUp {
+  font-size: var(--text-sm);
+  color: var(--muted);
+  text-align: center;
+}
+
+.controls {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.pair {
+  display: flex;
+  gap: var(--space-3);
+}
+
+.pair > * {
+  flex: 1;
+}
+
+.laps {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  width: 100%;
+  max-width: 320px;
+  margin-inline: auto;
+}
+
+.lap {
+  display: flex;
+  justify-content: space-between;
+  font-size: var(--text-sm);
+  padding: var(--space-2) 0;
+  border-bottom: 1px solid var(--line);
+}
+
+.lapIndex {
+  color: var(--muted);
+}
+
+.summary {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-2);
+  text-align: center;
+}
+
+.summaryTime {
+  font-size: clamp(48px, 16vw, 76px);
+  font-weight: 300;
+  line-height: 1;
+}
+
+.scroller {
+  width: 100%;
+  max-height: 34vh;
+  overflow-y: auto;
+}
