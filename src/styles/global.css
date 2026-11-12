@@ -12,7 +12,8 @@ html {
 html,
 body,
 #root {
-  height: 100%;
+  /* 100% is the tall viewport on iOS, the one hidden behind Safari's toolbar */
+  min-height: 100dvh;
 }
 
 body {
@@ -63,7 +64,7 @@ select {
 .screen {
   display: flex;
   flex-direction: column;
-  min-height: 100%;
+  min-height: 100dvh;
   padding: calc(env(safe-area-inset-top) + var(--space-5)) var(--space-4) var(--screen-bottom);
 }
 
