@@ -62,7 +62,7 @@ export function describe(timer: Timer): string {
     case 'intervals':
       return `${timer.rounds} séries · ${clockShort(timer.work)} d’effort · ${clockShort(timer.rest)} de repos`
     case 'emom':
-      return `${timer.rounds} rounds · un top toutes les ${clockShort(timer.period)}`
+      return `${timer.rounds} rounds · période de ${clockShort(timer.period)}`
     case 'countdown':
       return `${clockShort(timer.duration)} en comptant à rebours`
     case 'stopwatch':
