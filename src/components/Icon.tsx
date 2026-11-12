@@ -1,26 +1,20 @@
-type Props = { name: 'pencil' | 'plus' | 'back' | 'clock'; size?: number }
+import { ChevronLeft, Clock, Copy, Pencil, Plus, Trash2 } from 'lucide-react'
 
-const PATHS: Record<Props['name'], string> = {
-  pencil: 'M4 20h4L19 9l-4-4L4 16v4Zm12.5-16.5 4 4',
-  plus: 'M12 5v14M5 12h14',
-  back: 'M15 19l-7-7 7-7',
-  clock: 'M12 7v5l3 2M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z',
+// the shadcn icon set, kept behind one name so a screen never imports a glyph directly
+const ICONS = {
+  pencil: Pencil,
+  plus: Plus,
+  back: ChevronLeft,
+  clock: Clock,
+  copy: Copy,
+  trash: Trash2,
 }
 
+export type IconName = keyof typeof ICONS
+
+type Props = { name: IconName; size?: number }
+
 export default function Icon({ name, size = 20 }: Props) {
-  return (
-    <svg
-      width={size}
-      height={size}
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="1.8"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      aria-hidden="true"
-    >
-      <path d={PATHS[name]} />
-    </svg>
-  )
+  const Glyph = ICONS[name]
+  return <Glyph size={size} aria-hidden="true" />
 }
