@@ -32,7 +32,7 @@ export default function Settings() {
               ))}
             </span>
             <span className={styles.text}>
-              <span className={styles.name}>{item.name}</span>
+              <span className={`${styles.name} wordmark`}>{item.name}</span>
               <span className="subtle">{item.hint}</span>
             </span>
           </button>

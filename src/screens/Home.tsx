@@ -68,8 +68,8 @@ export default function Home() {
               >
                 <Link to={`/lancer/${timer.id}`} className={styles.main} draggable={false}>
                   <span className={styles.line}>
-                    <span className={styles.name}>{timer.name}</span>
-                    <span className={`${styles.total} digits`}>{totalShort(timer)}</span>
+                    <span className={`${styles.name} wordmark`}>{timer.name}</span>
+                    <Total timer={timer} />
                   </span>
                   <span className="subtle">{describe(timer)}</span>
                 </Link>
@@ -94,5 +94,15 @@ export default function Home() {
         />
       )}
     </div>
+  )
+}
+
+function Total({ timer }: { timer: Timer }) {
+  const total = totalShort(timer)
+  if (!total) return null
+  return (
+    <span className={`${styles.total} readout`}>
+      <span className="digits segments">{total.value}</span> {total.unit}
+    </span>
   )
 }

@@ -1,3 +1,8 @@
+/* the hairline a card draws around itself, painted only by the ambiance that asks for one */
+:root {
+  --surface-ring: transparent;
+}
+
 :root,
 [data-theme='foret'] {
   --bg: #16231c;
@@ -30,6 +35,26 @@
   --accent: #2bd9a0;
   --on-accent: #04190f;
   --surface-active: #342a23;
+}
+
+/* sampled from photographs of the watch: the face, the panel and its printed lines */
+[data-theme='lcd'] {
+  --bg: #0f1012;
+  /* a card is the case itself, told apart by its printed frame rather than by a fill */
+  --surface: #0f1012;
+  --surface-active: #191b1f;
+  --surface-ring: var(--line);
+  --line: #39538b;
+  --text: #deefed;
+  --muted: #8b9ea4;
+  --accent: #c9b673;
+  --on-accent: #0f1012;
+
+  --panel: #deefed;
+  --panel-ink: #1c1f20;
+  --panel-ghost: #b9cbca;
+  --face-red: #942d3d;
+  --face-white: #cccdd2;
 }
 
 :root {

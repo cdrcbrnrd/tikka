@@ -123,7 +123,10 @@ export function useRunner(timer: Timer): Runner {
     segment,
     nextSegment: index === -1 ? null : (segments[index + 1] ?? null),
     segmentRemainingMs: durationMs === null ? 0 : Math.max(0, end - elapsedMs),
-    segmentProgress: durationMs === null || durationMs === 0 ? 0 : segmentElapsedMs / durationMs,
+    segmentProgress:
+      durationMs === null || durationMs === 0
+        ? 0
+        : Math.min(1, Math.max(0, segmentElapsedMs / durationMs)),
     round: segment?.round ?? 0,
     rounds,
     laps,

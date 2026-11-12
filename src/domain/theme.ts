@@ -1,9 +1,11 @@
-export type ThemeId = 'foret' | 'nuit' | 'braise'
+export type ThemeId = 'foret' | 'nuit' | 'braise' | 'lcd'
 
 export type Theme = {
   id: ThemeId
   name: string
   hint: string
+  // the run screen draws a watch dial instead of the progress ring
+  dial?: boolean
   // the three colours that carry the ambiance, shown as swatches in the picker
   swatch: [string, string, string]
 }
@@ -22,6 +24,13 @@ export const THEMES: Theme[] = [
     swatch: ['#12161f', '#eef1f7', '#ff6a3d'],
   },
   {
+    id: 'lcd',
+    name: 'F-91W',
+    hint: 'Boîtier noir, panneau LCD, filet bleu',
+    swatch: ['#0f1012', '#deefed', '#c9b673'],
+    dial: true,
+  },
+  {
     id: 'braise',
     name: 'Braise',
     hint: 'Terre brûlée, sable, menthe',
@@ -30,3 +39,7 @@ export const THEMES: Theme[] = [
 ]
 
 export const DEFAULT_THEME: ThemeId = 'foret'
+
+export function hasDial(theme: ThemeId): boolean {
+  return THEMES.find((item) => item.id === theme)?.dial === true
+}

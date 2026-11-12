@@ -71,13 +71,15 @@ export function describe(timer: Timer): string {
   }
 }
 
+export type Total = { value: string; unit: string }
+
 // the figure the athlete picks a timer on, rounded to the minute: an open-ended timer has none
-export function totalShort(timer: Timer): string | null {
+export function totalShort(timer: Timer): Total | null {
   const segments = buildSegments(timer)
   if (segments.some((segment) => segment.duration === null)) return null
   const seconds = segments.reduce((total, segment) => total + (segment.duration ?? 0), 0)
-  if (seconds < 60) return `${seconds} s`
-  return `${Math.round(seconds / 60)} min`
+  if (seconds < 60) return { value: String(seconds), unit: 's' }
+  return { value: String(Math.round(seconds / 60)), unit: 'min' }
 }
 
 export function copyOf(timer: Timer): Timer {

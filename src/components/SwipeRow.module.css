@@ -13,7 +13,9 @@
   position: relative;
   flex: 0 0 100%;
   display: flex;
+  border-radius: var(--radius);
   background: var(--surface);
+  box-shadow: inset 0 0 0 1px var(--surface-ring);
   touch-action: pan-y;
 }
 
@@ -45,4 +47,9 @@
 .danger {
   background: var(--accent);
   color: var(--on-accent);
+}
+
+:global([data-theme='lcd']) .danger {
+  background: var(--face-red);
+  color: var(--face-white);
 }

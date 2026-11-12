@@ -11,7 +11,7 @@ type Props = {
 }
 
 export default function ProgressRing({ progress, tone, children }: Props) {
-  const offset = CIRCUMFERENCE * (1 - Math.min(1, Math.max(0, progress)))
+  const offset = CIRCUMFERENCE * (1 - progress)
 
   return (
     <div className={styles.wrap}>

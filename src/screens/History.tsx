@@ -46,12 +46,12 @@ export default function History() {
                       onClick={() => setOpen((current) => (current === session.id ? null : session.id))}
                     >
                       <span className={styles.left}>
-                        <span className={styles.name}>{session.name}</span>
+                        <span className={`${styles.name} wordmark`}>{session.name}</span>
                         <span className="subtle">{detail(session)}</span>
                       </span>
                       <span className={styles.right}>
-                        <span className={`${styles.duration} digits`}>{clock(session.elapsedMs / 1000)}</span>
-                        <span className="subtle digits">{sessionTime(session.startedAt)}</span>
+                        <span className={`${styles.duration} digits readout segments`}>{clock(session.elapsedMs / 1000)}</span>
+                        <span className={`subtle digits ${styles.hour}`}>{sessionTime(session.startedAt)}</span>
                       </span>
                     </button>
 

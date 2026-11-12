@@ -23,6 +23,7 @@
 .name {
   width: 100%;
   background: var(--surface);
+  box-shadow: inset 0 0 0 1px var(--surface-ring);
   border-radius: var(--radius);
   padding: var(--space-4);
   min-height: var(--tap);
@@ -76,3 +77,11 @@
   gap: var(--space-3);
 }
 
+:global([data-theme='lcd']) .groupLabel {
+  color: var(--accent);
+}
+
+:global([data-theme='lcd']) .kindOn {
+  background: var(--surface-active);
+  border-color: var(--accent);
+}

@@ -100,3 +100,25 @@
   margin-top: auto;
   padding-top: var(--space-5);
 }
+
+:global([data-theme='lcd']) .dayLabel {
+  color: var(--accent);
+}
+
+:global([data-theme='lcd']) .right {
+  gap: var(--space-2);
+}
+
+:global([data-theme='lcd']) .summary {
+  padding: var(--space-4);
+}
+
+:global([data-theme='lcd']) .duration {
+  --readout-gutter: var(--space-3);
+  font-size: var(--text-md);
+}
+
+/* the dial keeps one reading per row, the hour belongs to the printed line */
+:global([data-theme='lcd']) .hour {
+  display: none;
+}

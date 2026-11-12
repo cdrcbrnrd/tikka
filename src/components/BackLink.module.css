@@ -11,3 +11,11 @@
 .link:active {
   color: var(--text);
 }
+
+:global([data-theme='lcd']) .link {
+  color: var(--face-white);
+  font-size: var(--text-xs);
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}

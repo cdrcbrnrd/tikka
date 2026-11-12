@@ -84,7 +84,7 @@ export default function Stepper({
         >
           −
         </button>
-        <span className={`${styles.value} digits`}>{format(value)}</span>
+        <span className={`${styles.value} digits readout segments`}>{format(value)}</span>
         <button
           type="button"
           className={styles.step}

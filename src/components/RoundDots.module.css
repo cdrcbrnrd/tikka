@@ -19,5 +19,5 @@
 
 .current {
   background: var(--text);
-  box-shadow: 0 0 0 0.1875rem rgb(242 234 223 / 12%);
+  box-shadow: 0 0 0 0.1875rem color-mix(in srgb, var(--text) 12%, transparent);
 }
