@@ -29,9 +29,8 @@ export default function Home() {
     <div className="screen">
       <header className="screen-head">
         <h1 className="title">Tikka</h1>
-        <Link to="/historique" className={styles.headLink}>
-          <Icon name="clock" size={18} />
-          Historique
+        <Link to="/historique" className={styles.headLink} aria-label="Historique">
+          <Icon name="clock" size={28} />
         </Link>
       </header>
 
