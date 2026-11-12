@@ -1,4 +1,5 @@
-:root {
+:root,
+[data-theme='foret'] {
   --bg: #16231c;
   --surface: #1f3328;
   --line: #2c4536;
@@ -7,7 +8,31 @@
   --accent: #ff2e88;
   --on-accent: #1a0210;
   --surface-active: #26402f;
+}
 
+[data-theme='nuit'] {
+  --bg: #12161f;
+  --surface: #1b2130;
+  --line: #2a3245;
+  --text: #eef1f7;
+  --muted: #99a3b8;
+  --accent: #ff6a3d;
+  --on-accent: #1a0a04;
+  --surface-active: #232b3d;
+}
+
+[data-theme='braise'] {
+  --bg: #1c1714;
+  --surface: #2a221d;
+  --line: #3b3029;
+  --text: #f4ece3;
+  --muted: #b3a294;
+  --accent: #2bd9a0;
+  --on-accent: #04190f;
+  --surface-active: #342a23;
+}
+
+:root {
   --radius: 1rem;
   --radius-sm: 0.625rem;
   --radius-pill: 999px;
