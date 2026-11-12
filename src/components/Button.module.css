@@ -39,7 +39,7 @@
 }
 
 .surface:active:not(:disabled) {
-  background: #26402f;
+  background: var(--surface-active);
 }
 
 .ghost {

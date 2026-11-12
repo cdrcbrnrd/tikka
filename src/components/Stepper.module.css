@@ -38,7 +38,7 @@
 }
 
 .step:active:not(:disabled) {
-  background: #26402f;
+  background: var(--surface-active);
 }
 
 .step:disabled {
