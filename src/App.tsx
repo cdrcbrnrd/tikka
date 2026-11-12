@@ -4,6 +4,7 @@ import Editor from './screens/Editor.tsx'
 import History from './screens/History.tsx'
 import Home from './screens/Home.tsx'
 import Run from './screens/Run.tsx'
+import Settings from './screens/Settings.tsx'
 
 export default function App() {
   useTheme()
@@ -15,6 +16,7 @@ export default function App() {
       <Route path="/chrono/:id" element={<Editor />} />
       <Route path="/lancer/:id" element={<Run />} />
       <Route path="/historique" element={<History />} />
+      <Route path="/reglages" element={<Settings />} />
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
   )

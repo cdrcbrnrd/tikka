@@ -25,9 +25,14 @@ export default function Home() {
     <div className="screen">
       <header className="screen-head">
         <h1 className="title">Tikka</h1>
-        <Link to="/historique" className={styles.headLink} aria-label="Historique">
-          <Icon name="clock" size={28} />
-        </Link>
+        <nav className={styles.headLinks}>
+          <Link to="/historique" className={styles.headLink} aria-label="Historique">
+            <Icon name="clock" size={28} />
+          </Link>
+          <Link to="/reglages" className={styles.headLink} aria-label="Réglages">
+            <Icon name="settings" size={28} />
+          </Link>
+        </nav>
       </header>
 
       {timers.length === 0 ? (
