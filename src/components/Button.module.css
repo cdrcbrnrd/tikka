@@ -24,7 +24,7 @@
 
 .accent {
   background: var(--accent);
-  color: #1a0210;
+  color: var(--on-accent);
 }
 
 .accent:active:not(:disabled) {
