@@ -1,16 +1,17 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { buildSegments, totalRounds, type Segment, type Timer } from '../domain/timer.ts'
-import { playCue, unlockAudio } from './cues.ts'
+import { createCueScheduler } from './cueScheduler.ts'
+import { unlockAudio, playCue } from './cues.ts'
 
 export type RunnerStatus = 'idle' | 'running' | 'paused' | 'done'
 
-export type RunnerView = {
+export type Runner = {
   status: RunnerStatus
   elapsedMs: number
+  sessionMs: number
   totalMs: number
   segment: Segment | null
   nextSegment: Segment | null
-  segmentIndex: number
   segmentRemainingMs: number
   segmentProgress: number
   round: number
@@ -18,9 +19,6 @@ export type RunnerView = {
   laps: number[]
   openEnded: boolean
   completed: boolean
-}
-
-export type Runner = RunnerView & {
   start: () => void
   pause: () => void
   resume: () => void
@@ -28,35 +26,34 @@ export type Runner = RunnerView & {
   lap: () => void
 }
 
+// the display only needs tenths, a state change per frame would re-render for nothing
+const TICK_MS = 100
+
 export function useRunner(timer: Timer): Runner {
   const segments = useMemo(() => buildSegments(timer), [timer])
   const bounds = useMemo(() => cumulativeBounds(segments), [segments])
-  const totalMs = bounds.length > 0 ? bounds[bounds.length - 1]! : 0
-  const openEnded = segments.length === 0 || timer.kind === 'stopwatch'
+  const totalMs = useMemo(() => sumDurations(segments), [segments])
+  const rounds = useMemo(() => totalRounds(segments), [segments])
+  const cues = useMemo(() => createCueScheduler(), [])
+  const openEnded = segments.length === 0 || segments[segments.length - 1]?.duration === null
 
   const [status, setStatus] = useState<RunnerStatus>('idle')
   const [elapsedMs, setElapsedMs] = useState(0)
   const [laps, setLaps] = useState<number[]>([])
-  const [completed, setCompleted] = useState(false)
 
+  // shifted forward on resume, so the elapsed time is always a plain subtraction
   const startedAt = useRef<number | null>(null)
-  const pausedTotal = useRef(0)
   const pausedAt = useRef<number | null>(null)
-  const lastSegment = useRef(-1)
-  const lastTick = useRef('')
 
   const start = useCallback(() => {
     unlockAudio()
     startedAt.current = Date.now()
-    pausedTotal.current = 0
     pausedAt.current = null
-    lastSegment.current = 0
-    lastTick.current = ''
+    cues.reset()
     setLaps([])
     setElapsedMs(0)
-    setCompleted(false)
     setStatus('running')
-  }, [])
+  }, [cues])
 
   const pause = useCallback(() => {
     if (startedAt.current === null) return
@@ -65,8 +62,8 @@ export function useRunner(timer: Timer): Runner {
   }, [])
 
   const resume = useCallback(() => {
-    if (pausedAt.current !== null) {
-      pausedTotal.current += Date.now() - pausedAt.current
+    if (startedAt.current !== null && pausedAt.current !== null) {
+      startedAt.current += Date.now() - pausedAt.current
       pausedAt.current = null
     }
     setStatus('running')
@@ -78,8 +75,9 @@ export function useRunner(timer: Timer): Runner {
 
   const lap = useCallback(() => {
     if (startedAt.current === null) return
-    setLaps((current) => [...current, Date.now() - startedAt.current! - pausedTotal.current])
-  }, [])
+    const elapsed = Date.now() - startedAt.current
+    setLaps((current) => [...current, elapsed - segmentStart(elapsed, bounds)])
+  }, [bounds])
 
   useEffect(() => {
     if (status !== 'running') return
@@ -88,88 +86,76 @@ export function useRunner(timer: Timer): Runner {
     const loop = () => {
       const started = startedAt.current
       if (started !== null) {
-        const elapsed = Date.now() - started - pausedTotal.current
-        const finished = !openEnded && elapsed >= totalMs
-        setElapsedMs(finished ? totalMs : elapsed)
-        if (finished) {
+        const elapsed = Date.now() - started
+        if (!openEnded && elapsed >= totalMs) {
           playCue('end')
-          setCompleted(true)
+          setElapsedMs(totalMs)
           setStatus('done')
           return
         }
-        announce(elapsed, bounds, segments, lastSegment, lastTick)
+        const index = segmentAt(elapsed, bounds)
+        const end = bounds[index] ?? 0
+        cues.tick(index, segments[index]?.kind ?? 'work', Number.isFinite(end) ? end - elapsed : 0)
+        setElapsedMs((previous) =>
+          Math.floor(elapsed / TICK_MS) === Math.floor(previous / TICK_MS) ? previous : elapsed,
+        )
       }
       frame = requestAnimationFrame(loop)
     }
 
     frame = requestAnimationFrame(loop)
     return () => cancelAnimationFrame(frame)
-  }, [status, bounds, segments, totalMs, openEnded])
+  }, [status, bounds, segments, totalMs, openEnded, cues])
 
-  const view = useMemo<RunnerView>(() => {
-    const index = segmentAt(elapsedMs, bounds)
-    const segment = index === -1 ? null : (segments[index] ?? null)
-    const end = index === -1 ? 0 : (bounds[index] ?? 0)
-    const duration = segment ? segment.duration * 1000 : 0
-    const start = end - duration
-    return {
-      status,
-      elapsedMs,
-      totalMs,
-      segment,
-      nextSegment: index === -1 ? null : (segments[index + 1] ?? null),
-      segmentIndex: index,
-      segmentRemainingMs: segment ? Math.max(0, end - elapsedMs) : 0,
-      segmentProgress: duration > 0 ? Math.min(1, Math.max(0, (elapsedMs - start) / duration)) : 0,
-      round: segment?.round ?? 0,
-      rounds: totalRounds(segments),
-      laps,
-      openEnded,
-      completed,
-    }
-  }, [status, elapsedMs, totalMs, bounds, segments, laps, openEnded, completed])
+  const index = segmentAt(elapsedMs, bounds)
+  const segment = index === -1 ? null : (segments[index] ?? null)
+  const end = index === -1 ? 0 : (bounds[index] ?? 0)
+  const durationMs = segment?.duration == null ? null : segment.duration * 1000
+  const segmentElapsedMs = index === -1 ? elapsedMs : elapsedMs - segmentStart(elapsedMs, bounds)
+  // the warm-up of an open-ended timer is not part of what the athlete clocked
+  const openStart = openEnded && segments.length > 1 ? (bounds[segments.length - 2] ?? 0) : 0
 
-  return { ...view, start, pause, resume, stop, lap }
+  return {
+    status,
+    elapsedMs,
+    sessionMs: openEnded ? Math.max(0, elapsedMs - openStart) : elapsedMs,
+    totalMs,
+    segment,
+    nextSegment: index === -1 ? null : (segments[index + 1] ?? null),
+    segmentRemainingMs: durationMs === null ? 0 : Math.max(0, end - elapsedMs),
+    segmentProgress: durationMs === null || durationMs === 0 ? 0 : segmentElapsedMs / durationMs,
+    round: segment?.round ?? 0,
+    rounds,
+    laps,
+    openEnded,
+    completed: status === 'done' && !openEnded && elapsedMs >= totalMs,
+    start,
+    pause,
+    resume,
+    stop,
+    lap,
+  }
+}
+
+function sumDurations(segments: Segment[]): number {
+  return segments.reduce((total, segment) => total + (segment.duration ?? 0) * 1000, 0)
 }
 
 function cumulativeBounds(segments: Segment[]): number[] {
   let total = 0
   return segments.map((segment) => {
+    if (segment.duration === null) return Number.POSITIVE_INFINITY
     total += segment.duration * 1000
     return total
   })
 }
 
 function segmentAt(elapsedMs: number, bounds: number[]): number {
-  for (let i = 0; i < bounds.length; i += 1) {
-    if (elapsedMs < bounds[i]!) return i
-  }
-  return bounds.length === 0 ? -1 : bounds.length - 1
+  const index = bounds.findIndex((bound) => elapsedMs < bound)
+  return index === -1 ? bounds.length - 1 : index
 }
 
-// one cue per transition and per counted second, so coming back from sleep never fires a burst
-function announce(
-  elapsedMs: number,
-  bounds: number[],
-  segments: Segment[],
-  lastSegment: { current: number },
-  lastTick: { current: string },
-): void {
+function segmentStart(elapsedMs: number, bounds: number[]): number {
   const index = segmentAt(elapsedMs, bounds)
-  if (index === -1) return
-
-  if (index !== lastSegment.current) {
-    lastSegment.current = index
-    playCue(segments[index]?.kind === 'rest' ? 'rest' : 'go')
-    return
-  }
-
-  const remaining = Math.ceil(Math.max(0, bounds[index]! - elapsedMs) / 1000)
-  if (remaining > 0 && remaining <= 3) {
-    const key = `${index}:${remaining}`
-    if (key !== lastTick.current) {
-      lastTick.current = key
-      playCue('tick')
-    }
-  }
+  return index <= 0 ? 0 : (bounds[index - 1] ?? 0)
 }

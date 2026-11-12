@@ -34,8 +34,10 @@ export function playCue(cue: Cue): void {
 }
 
 export function releaseAudio(): void {
-  void context?.close()
+  const closing = context
   context = null
+  // the end cue lasts about a second, closing right away would cut it off
+  setTimeout(() => void closing?.close(), 1200)
 }
 
 function tone(freq: number, duration: number, gain: number, delay = 0): void {

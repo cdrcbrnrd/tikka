@@ -4,10 +4,11 @@ import BackLink from '../components/BackLink.tsx'
 import Button from '../components/Button.tsx'
 import ProgressRing from '../components/ProgressRing.tsx'
 import RoundDots from '../components/RoundDots.tsx'
-import { clock, clockTenths } from '../domain/format.ts'
+import { clock, clockTenths, plural, splits } from '../domain/format.ts'
 import { newId } from '../domain/id.ts'
-import type { Timer } from '../domain/timer.ts'
-import { useRunner } from '../engine/useRunner.ts'
+import type { Segment, SegmentKind, Timer } from '../domain/timer.ts'
+import { releaseAudio } from '../engine/cues.ts'
+import { useRunner, type RunnerStatus } from '../engine/useRunner.ts'
 import { useWakeLock } from '../engine/useWakeLock.ts'
 import { useHistory } from '../store/history.ts'
 import { useTimer } from '../store/timers.ts'
@@ -33,20 +34,23 @@ function Session({ timer }: { timer: Timer }) {
 
   useWakeLock(runner.status === 'running')
 
+  // keeping the audio hardware awake between sessions costs battery for nothing
+  useEffect(() => releaseAudio, [])
+
   // the runner's values are already final on the render where the status flips to done,
   // so watching the status alone avoids re-running this on every frame
   useEffect(() => {
     if (runner.status !== 'done' || saved.current) return
     saved.current = true
-    if (runner.elapsedMs < MIN_SESSION_MS) return
+    if (runner.sessionMs < MIN_SESSION_MS) return
     addSession({
       id: newId(),
       timerId: timer.id,
       name: timer.name,
       kind: timer.kind,
       startedAt: startedAt.current ?? new Date().toISOString(),
-      elapsedMs: runner.elapsedMs,
-      roundsDone: runner.completed ? runner.rounds : runner.round,
+      elapsedMs: runner.sessionMs,
+      roundsDone: runner.round,
       laps: runner.laps,
       completed: runner.completed,
     })
@@ -59,8 +63,9 @@ function Session({ timer }: { timer: Timer }) {
     runner.start()
   }
 
-  const urgent = runner.status === 'running' && !runner.openEnded && runner.segmentRemainingMs <= 3000
-  const tone = ringTone(runner.status, runner.segment?.kind, urgent, runner.openEnded)
+  const counting = runner.segment?.duration === null
+  const urgent = runner.status === 'running' && !counting && runner.segmentRemainingMs <= 3000
+  const tone = ringTone(runner.status, runner.segment?.kind, urgent, counting)
   const totalLeft = Math.max(0, runner.totalMs - runner.elapsedMs)
 
   return (
@@ -81,12 +86,13 @@ function Session({ timer }: { timer: Timer }) {
       {runner.status === 'done' ? (
         <div className={styles.stage}>
           <div className={styles.summary}>
-            <span className={styles.phase}>{runner.completed ? 'Séance terminée' : 'Séance arrêtée'}</span>
-            <span className={`${styles.summaryTime} digits`}>{clock(runner.elapsedMs / 1000)}</span>
+            <span className={styles.phase}>
+              {runner.completed ? 'Séance terminée' : 'Séance arrêtée'}
+            </span>
+            <span className={`${styles.summaryTime} digits`}>{clock(runner.sessionMs / 1000)}</span>
             {runner.rounds > 0 && (
               <span className="subtle">
-                {runner.completed ? runner.rounds : runner.round} round
-                {(runner.completed ? runner.rounds : runner.round) > 1 ? 's' : ''} sur {runner.rounds}
+                {plural(runner.round, 'round')} sur {runner.rounds}
               </span>
             )}
           </div>
@@ -97,21 +103,21 @@ function Session({ timer }: { timer: Timer }) {
           <ProgressRing progress={runner.segmentProgress} tone={tone}>
             <span className={styles.phase}>{runner.segment?.label ?? 'Chrono'}</span>
             <span className={`${styles.time} digits ${urgent ? styles.urgent : ''}`}>
-              {runner.openEnded
-                ? clockTenths(runner.elapsedMs)
+              {counting
+                ? clockTenths(runner.sessionMs)
                 : clock(Math.ceil(runner.segmentRemainingMs / 1000))}
             </span>
-            {!runner.openEnded && <span className="subtle digits">{clock(totalLeft / 1000)} au total</span>}
+            {!runner.openEnded && (
+              <span className="subtle digits">{clock(totalLeft / 1000)} au total</span>
+            )}
           </ProgressRing>
 
           <div className={styles.under}>
             <RoundDots round={runner.round} rounds={runner.rounds} />
             {runner.nextSegment && (
-              <span className={styles.nextUp}>
-                Ensuite · {runner.nextSegment.label} {clock(runner.nextSegment.duration)}
-              </span>
+              <span className={styles.nextUp}>Ensuite · {nextLabel(runner.nextSegment)}</span>
             )}
-            {runner.openEnded && runner.laps.length > 0 && (
+            {runner.laps.length > 0 && (
               <span className="subtle digits">Dernier tour {clockTenths(lastSplit(runner.laps))}</span>
             )}
           </div>
@@ -127,7 +133,7 @@ function Session({ timer }: { timer: Timer }) {
 
         {runner.status === 'running' && (
           <>
-            {runner.openEnded && (
+            {counting && (
               <Button variant="accent" block onClick={runner.lap}>
                 Tour
               </Button>
@@ -165,10 +171,10 @@ function Laps({ laps }: { laps: number[] }) {
   return (
     <div className={styles.scroller}>
       <ol className={styles.laps}>
-        {laps.map((lap, index) => (
+        {splits(laps).map((split, index) => (
           <li key={index} className={styles.lap}>
             <span className={styles.lapIndex}>Tour {index + 1}</span>
-            <span className="digits">{clockTenths(lap - (laps[index - 1] ?? 0))}</span>
+            <span className="digits">{clockTenths(split)}</span>
           </li>
         ))}
       </ol>
@@ -176,18 +182,20 @@ function Laps({ laps }: { laps: number[] }) {
   )
 }
 
+function nextLabel(segment: Segment): string {
+  return segment.duration === null ? segment.label : `${segment.label} ${clock(segment.duration)}`
+}
+
 function lastSplit(laps: number[]): number {
-  const last = laps[laps.length - 1] ?? 0
-  const previous = laps[laps.length - 2] ?? 0
-  return last - previous
+  return splits(laps).at(-1) ?? 0
 }
 
 function ringTone(
-  status: string,
-  kind: string | undefined,
+  status: RunnerStatus,
+  kind: SegmentKind | undefined,
   urgent: boolean,
-  openEnded: boolean,
+  counting: boolean,
 ): 'accent' | 'calm' | 'dim' {
-  if (openEnded || status === 'idle' || urgent) return 'dim'
+  if (counting || status === 'idle' || urgent) return 'dim'
   return kind === 'work' ? 'accent' : 'calm'
 }

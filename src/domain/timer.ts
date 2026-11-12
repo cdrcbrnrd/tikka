@@ -72,10 +72,11 @@ export function describe(timer: Timer): string {
 
 export type SegmentKind = 'prepare' | 'work' | 'rest'
 
+// a null duration runs until the athlete stops it, and only the last segment may be open
 export type Segment = {
   kind: SegmentKind
   label: string
-  duration: number
+  duration: number | null
   round: number
 }
 
@@ -104,6 +105,7 @@ export function buildSegments(timer: Timer): Segment[] {
       segments.push({ kind: 'work', label: 'En route', duration: timer.duration, round: 1 })
       break
     case 'stopwatch':
+      segments.push({ kind: 'work', label: 'Chrono', duration: null, round: 0 })
       break
   }
 

@@ -1,8 +1,10 @@
+import { memo } from 'react'
 import styles from './RoundDots.module.css'
 
 type Props = { round: number; rounds: number }
 
-export default function RoundDots({ round, rounds }: Props) {
+// props barely change while the runner re-renders ten times a second
+function RoundDots({ round, rounds }: Props) {
   if (rounds < 2 || rounds > 12) return null
 
   return (
@@ -15,3 +17,5 @@ export default function RoundDots({ round, rounds }: Props) {
     </div>
   )
 }
+
+export default memo(RoundDots)
