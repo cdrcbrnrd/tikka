@@ -21,10 +21,10 @@
   --space-7: 3rem;
 
   /* Apple's control sizes are points, not text: they do not follow the root scale */
-  --tap: 44px;
-  --control: 50px;
-  /* the safe area already clears the home indicator, 16pt on top of it is the iOS margin */
-  --screen-bottom: calc(env(safe-area-inset-bottom) + var(--space-4));
+  --tap: 48px;
+  --control: 56px;
+  /* the bar sits on the bottom edge, the safe area is the only thing between it and the glass */
+  --screen-bottom: env(safe-area-inset-bottom);
   --transition: 150ms ease;
 
   --font: -apple-system, BlinkMacSystemFont, "SF Pro Text", system-ui, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
