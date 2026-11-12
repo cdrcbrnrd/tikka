@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef } from 'react'
+import { useEffect, useRef } from 'react'
 import styles from './Stepper.module.css'
 
 type Props = {
@@ -7,37 +7,40 @@ type Props = {
   min: number
   max: number
   onChange: (value: number) => void
-  format: (value: number) => string
+  format?: (value: number) => string
   stepFor?: (value: number) => number
 }
 
 const HOLD_DELAY = 400
 const HOLD_RATE = 90
 
-export default function Stepper({ label, value, min, max, onChange, format, stepFor }: Props) {
+export default function Stepper({
+  label,
+  value,
+  min,
+  max,
+  onChange,
+  format = String,
+  stepFor = () => 1,
+}: Props) {
   const latest = useRef(value)
-  const timeout = useRef<number | undefined>(undefined)
-  const interval = useRef<number | undefined>(undefined)
+  const release = useRef<(() => void) | null>(null)
 
   useEffect(() => {
     latest.current = value
   }, [value])
 
-  const stopHold = useCallback(function stop() {
-    clearTimeout(timeout.current)
-    clearInterval(interval.current)
-    timeout.current = undefined
-    interval.current = undefined
-    window.removeEventListener('pointerup', stop)
-  }, [])
+  const stopHold = () => {
+    release.current?.()
+    release.current = null
+  }
 
-  useEffect(() => stopHold, [stopHold])
+  useEffect(() => stopHold, [])
 
   // the repeat reads the ref, a closure over the prop would keep applying the same step
   const bump = (direction: 1 | -1) => {
     const current = latest.current
-    const step = stepFor ? stepFor(current) : 1
-    const next = Math.min(max, Math.max(min, current + direction * step))
+    const next = Math.min(max, Math.max(min, current + direction * stepFor(current)))
     if (next === current) {
       stopHold()
       return
@@ -49,11 +52,21 @@ export default function Stepper({ label, value, min, max, onChange, format, step
   const startHold = (direction: 1 | -1) => {
     stopHold()
     bump(direction)
-    // the button can become disabled mid-hold, so the release is caught on the window too
-    window.addEventListener('pointerup', stopHold)
-    timeout.current = setTimeout(() => {
-      interval.current = setInterval(() => bump(direction), HOLD_RATE)
+
+    let repeat: number | undefined
+    const delay = setTimeout(() => {
+      repeat = setInterval(() => bump(direction), HOLD_RATE)
     }, HOLD_DELAY)
+
+    const stop = () => {
+      clearTimeout(delay)
+      clearInterval(repeat)
+      window.removeEventListener('pointerup', stop)
+    }
+
+    release.current = stop
+    // the button can become disabled mid-hold and then never sees the release
+    window.addEventListener('pointerup', stop)
   }
 
   return (
@@ -66,7 +79,6 @@ export default function Stepper({ label, value, min, max, onChange, format, step
           aria-label={`Diminuer ${label}`}
           disabled={value <= min}
           onPointerDown={() => startHold(-1)}
-          onPointerUp={stopHold}
           onPointerLeave={stopHold}
           onPointerCancel={stopHold}
         >
@@ -79,7 +91,6 @@ export default function Stepper({ label, value, min, max, onChange, format, step
           aria-label={`Augmenter ${label}`}
           disabled={value >= max}
           onPointerDown={() => startHold(1)}
-          onPointerUp={stopHold}
           onPointerLeave={stopHold}
           onPointerCancel={stopHold}
         >
