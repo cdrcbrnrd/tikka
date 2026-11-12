@@ -14,9 +14,10 @@
 
   --space-1: 4px;
   --space-2: 8px;
-  --space-3: 12px;
-  --space-4: 16px;
-  --space-5: 24px;
+  /* the gaps follow the width too, the layout should breathe the same on every phone */
+  --space-3: clamp(12px, 3.4vw, 16px);
+  --space-4: clamp(16px, 4.6vw, 22px);
+  --space-5: clamp(24px, 6.8vw, 32px);
   --space-6: 32px;
   --space-7: 48px;
 
@@ -25,9 +26,10 @@
   --transition: 150ms ease;
 
   --font: -apple-system, BlinkMacSystemFont, "SF Pro Text", system-ui, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-  --text-xs: 12px;
-  --text-sm: 14px;
-  --text-md: 16px;
-  --text-lg: 20px;
-  --text-xl: 28px;
+  /* the type follows the width of the phone, a 6.1 inch screen is not a 4.7 */
+  --text-xs: clamp(12px, 3.4vw, 16px);
+  --text-sm: clamp(14px, 4vw, 18px);
+  --text-md: clamp(16px, 4.8vw, 21px);
+  --text-lg: clamp(20px, 6vw, 26px);
+  --text-xl: clamp(28px, 8.2vw, 38px);
 }
