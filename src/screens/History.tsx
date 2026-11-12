@@ -29,7 +29,7 @@ export default function History() {
           <p className="subtle">Les séances arrivent ici dès qu’un chrono est allé au bout.</p>
         </div>
       ) : (
-        <div className="grow">
+        <div className={`grow ${styles.body}`}>
           {days.map(([label, entries]) => (
             <section key={label} className={styles.day}>
               <h2 className={styles.dayLabel}>{label}</h2>

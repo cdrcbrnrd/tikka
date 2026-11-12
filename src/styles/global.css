@@ -47,6 +47,7 @@ input,
 select {
   font: inherit;
   color: inherit;
+  border: none;
 }
 
 :focus-visible {
@@ -59,7 +60,7 @@ select {
   flex-direction: column;
   min-height: 100%;
   padding: calc(env(safe-area-inset-top) + var(--space-5)) var(--space-4)
-    calc(env(safe-area-inset-bottom) + var(--space-4));
+    calc(env(safe-area-inset-bottom) + var(--space-5));
 }
 
 .screen-head {

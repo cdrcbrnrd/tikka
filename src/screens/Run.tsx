@@ -72,7 +72,7 @@ function Session({ timer }: { timer: Timer }) {
   const totalLeft = Math.max(0, runner.totalMs - runner.elapsedMs)
 
   return (
-    <div className={styles.screen}>
+    <div className={`screen ${styles.screen}`}>
       <header className={styles.head}>
         {runner.status === 'idle' || runner.status === 'done' ? (
           <BackLink to="/" label="Mes chronos" />

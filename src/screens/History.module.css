@@ -25,7 +25,6 @@
 
 .entry {
   background: var(--surface);
-  border: 1px solid var(--line);
   border-radius: var(--radius);
   overflow: hidden;
 }
@@ -89,8 +88,15 @@
   border-top: 1px solid var(--line);
 }
 
+.body {
+  display: flex;
+  flex-direction: column;
+}
+
 .footer {
   display: flex;
   justify-content: center;
-  padding-top: var(--space-4);
+  /* the clear action sits on the bottom edge like every other footer button */
+  margin-top: auto;
+  padding-top: var(--space-5);
 }

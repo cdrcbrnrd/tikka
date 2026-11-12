@@ -42,7 +42,7 @@
 
 .footer {
   position: sticky;
-  bottom: 0;
+  bottom: calc(env(safe-area-inset-bottom) + var(--space-5));
   padding-top: var(--space-5);
   background: linear-gradient(to top, var(--bg) 60%, transparent);
 }

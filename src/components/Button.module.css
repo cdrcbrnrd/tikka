@@ -10,7 +10,6 @@
   font-weight: 600;
   transition:
     background var(--transition),
-    border-color var(--transition),
     opacity var(--transition);
 }
 
@@ -34,7 +33,6 @@
 
 .surface {
   background: var(--surface);
-  border: 1px solid var(--line);
   color: var(--text);
 }
 
