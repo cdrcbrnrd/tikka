@@ -23,12 +23,12 @@ export default function Stepper({ label, value, min, max, onChange, format, step
     latest.current = value
   }, [value])
 
-  const stopHold = useCallback(() => {
+  const stopHold = useCallback(function stop() {
     clearTimeout(timeout.current)
     clearInterval(interval.current)
     timeout.current = undefined
     interval.current = undefined
-    window.removeEventListener('pointerup', stopHold)
+    window.removeEventListener('pointerup', stop)
   }, [])
 
   useEffect(() => stopHold, [stopHold])
