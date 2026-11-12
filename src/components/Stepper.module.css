@@ -24,8 +24,8 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 40px;
-  height: 40px;
+  width: var(--tap);
+  height: var(--tap);
   border-radius: 50%;
   border: 1px solid var(--line);
   color: var(--text);
@@ -46,7 +46,7 @@
 }
 
 .value {
-  min-width: 72px;
+  min-width: 4.5rem;
   text-align: center;
   font-size: var(--text-lg);
   font-weight: 500;
