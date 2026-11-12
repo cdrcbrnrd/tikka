@@ -25,18 +25,6 @@
   font-weight: 600;
 }
 
-.option {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: var(--space-3);
-  width: 100%;
-  min-height: var(--tap);
-  padding: var(--space-3) var(--space-2) var(--space-4);
-  font-size: var(--text-sm);
-  text-align: left;
-}
-
 .headLink {
   display: inline-flex;
   align-items: center;

@@ -12,7 +12,6 @@ import { useAudioSession } from '../engine/useAudioSession.ts'
 import { useRunner } from '../engine/useRunner.ts'
 import { useWakeLock } from '../engine/useWakeLock.ts'
 import { useHistory } from '../store/history.ts'
-import { useSettings } from '../store/settings.ts'
 import { useTimer } from '../store/timers.ts'
 import styles from './Run.module.css'
 
@@ -28,7 +27,6 @@ export default function Run() {
 }
 
 function Session({ timer }: { timer: Timer }) {
-  const ringInSilentMode = useSettings((state) => state.ringInSilentMode)
   const runner = useRunner(timer)
   const navigate = useNavigate()
   const addSession = useHistory((state) => state.add)
@@ -37,7 +35,7 @@ function Session({ timer }: { timer: Timer }) {
 
   useWakeLock(runner.status === 'running')
   // claimed only once the session is under way, opening a timer should not pause the music
-  useAudioSession(ringInSilentMode && runner.status !== 'idle')
+  useAudioSession(runner.status !== 'idle')
 
   // keeping the audio hardware awake between sessions costs battery for nothing
   useEffect(() => releaseAudio, [])
