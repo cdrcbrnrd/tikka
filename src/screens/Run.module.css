@@ -28,12 +28,16 @@
   gap: var(--space-5);
 }
 
-.phase {
-  font-size: var(--text-sm);
-  font-weight: 600;
+.phase,
+.nextTag {
   letter-spacing: 0.14em;
   text-transform: uppercase;
   color: var(--muted);
+}
+
+.phase {
+  font-size: var(--text-sm);
+  font-weight: 600;
 }
 
 .time {
@@ -65,9 +69,6 @@
 
 .nextTag {
   font-size: var(--text-xs);
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
-  color: var(--muted);
 }
 
 .nextPhase {

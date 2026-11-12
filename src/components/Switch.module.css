@@ -11,8 +11,8 @@
 .track::after {
   content: '';
   position: absolute;
-  top: 4px;
-  left: 4px;
+  top: var(--space-1);
+  left: var(--space-1);
   width: 20px;
   height: 20px;
   border-radius: 50%;
