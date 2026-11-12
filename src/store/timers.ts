@@ -1,6 +1,5 @@
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
-import { newId } from '../domain/id.ts'
 import type { Timer } from '../domain/timer.ts'
 
 const PRESETS: Timer[] = [
@@ -14,12 +13,11 @@ type TimersState = {
   timers: Timer[]
   upsert: (timer: Timer) => void
   remove: (id: string) => void
-  duplicate: (id: string) => Timer | undefined
 }
 
 export const useTimers = create<TimersState>()(
   persist(
-    (set, get) => ({
+    (set) => ({
       timers: PRESETS,
       upsert: (timer) =>
         set((state) => {
@@ -30,13 +28,6 @@ export const useTimers = create<TimersState>()(
           return { timers }
         }),
       remove: (id) => set((state) => ({ timers: state.timers.filter((item) => item.id !== id) })),
-      duplicate: (id) => {
-        const source = get().timers.find((item) => item.id === id)
-        if (!source) return undefined
-        const copy: Timer = { ...source, id: newId(), name: `${source.name} (copie)` }
-        set((state) => ({ timers: [...state.timers, copy] }))
-        return copy
-      },
     }),
     { name: 'tikka.timers', version: 1 },
   ),
