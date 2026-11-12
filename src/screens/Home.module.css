@@ -20,9 +20,22 @@
   background: var(--surface-active);
 }
 
+.line {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--space-3);
+}
+
 .name {
   font-size: var(--text-md);
   font-weight: 600;
+}
+
+.total {
+  flex: none;
+  font-size: var(--text-sm);
+  color: var(--muted);
 }
 
 .headLinks {
