@@ -6,9 +6,9 @@ import ProgressRing from '../components/ProgressRing.tsx'
 import RoundDots from '../components/RoundDots.tsx'
 import { clock, clockTenths, plural, splits } from '../domain/format.ts'
 import { newId } from '../domain/id.ts'
-import type { Segment, SegmentKind, Timer } from '../domain/timer.ts'
+import type { Timer } from '../domain/timer.ts'
 import { releaseAudio } from '../engine/cues.ts'
-import { useRunner, type RunnerStatus } from '../engine/useRunner.ts'
+import { useRunner } from '../engine/useRunner.ts'
 import { useWakeLock } from '../engine/useWakeLock.ts'
 import { useHistory } from '../store/history.ts'
 import { useTimer } from '../store/timers.ts'
@@ -65,7 +65,8 @@ function Session({ timer }: { timer: Timer }) {
 
   const counting = runner.segment?.duration === null
   const urgent = runner.status === 'running' && !counting && runner.segmentRemainingMs <= 3000
-  const tone = ringTone(runner.status, runner.segment?.kind, urgent, counting)
+  // the digits already carry the accent in the last seconds, the ring keeps its progress in muted
+  const tone = runner.segment?.kind === 'work' && !urgent ? 'accent' : 'calm'
   const totalLeft = Math.max(0, runner.totalMs - runner.elapsedMs)
 
   return (
@@ -115,7 +116,15 @@ function Session({ timer }: { timer: Timer }) {
           <div className={styles.under}>
             <RoundDots round={runner.round} rounds={runner.rounds} />
             {runner.nextSegment && (
-              <span className={styles.nextUp}>Ensuite · {nextLabel(runner.nextSegment)}</span>
+              <div className={styles.nextUp}>
+                <span className={styles.nextTag}>Next</span>
+                <span className={styles.nextPhase}>
+                  {runner.nextSegment.label}
+                  {runner.nextSegment.duration !== null && (
+                    <span className={`digits ${styles.nextTime}`}>{clock(runner.nextSegment.duration)}</span>
+                  )}
+                </span>
+              </div>
             )}
             {runner.laps.length > 0 && (
               <span className="subtle digits">Dernier tour {clockTenths(lastSplit(runner.laps))}</span>
@@ -182,20 +191,6 @@ function Laps({ laps }: { laps: number[] }) {
   )
 }
 
-function nextLabel(segment: Segment): string {
-  return segment.duration === null ? segment.label : `${segment.label} ${clock(segment.duration)}`
-}
-
 function lastSplit(laps: number[]): number {
   return splits(laps).at(-1) ?? 0
-}
-
-function ringTone(
-  status: RunnerStatus,
-  kind: SegmentKind | undefined,
-  urgent: boolean,
-  counting: boolean,
-): 'accent' | 'calm' | 'dim' {
-  if (counting || status === 'idle' || urgent) return 'dim'
-  return kind === 'work' ? 'accent' : 'calm'
 }

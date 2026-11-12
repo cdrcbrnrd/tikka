@@ -6,7 +6,7 @@ const CIRCUMFERENCE = 2 * Math.PI * RADIUS
 
 type Props = {
   progress: number
-  tone: 'accent' | 'calm' | 'dim'
+  tone: 'accent' | 'calm'
   children: ReactNode
 }
 

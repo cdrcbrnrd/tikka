@@ -29,10 +29,6 @@
   stroke: var(--muted);
 }
 
-.dim {
-  stroke: var(--line);
-}
-
 .inner {
   position: absolute;
   inset: 0;
