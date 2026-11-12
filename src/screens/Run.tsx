@@ -108,7 +108,7 @@ function Session({ timer }: { timer: Timer }) {
                 : clock(Math.ceil(runner.segmentRemainingMs / 1000))}
             </span>
             {!runner.openEnded && (
-              <span className="subtle digits">{clock(totalLeft / 1000)} au total</span>
+              <span className="subtle digits">{clock(Math.ceil(totalLeft / 1000))} au total</span>
             )}
           </ProgressRing>
 
