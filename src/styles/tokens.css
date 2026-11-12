@@ -20,7 +20,8 @@
   --space-7: 48px;
 
   --tap: 48px;
-  --transition: 150ms ease;
+  --transition-ms: 150ms;
+  --transition: var(--transition-ms) ease;
 
   --font: -apple-system, BlinkMacSystemFont, "SF Pro Text", system-ui, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
   --text-xs: 12px;

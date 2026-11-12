@@ -1,4 +1,5 @@
 import { clockShort } from './format.ts'
+import { newId } from './id.ts'
 
 export type TimerKind = 'intervals' | 'emom' | 'countdown' | 'stopwatch'
 
@@ -68,6 +69,10 @@ export function describe(timer: Timer): string {
     case 'stopwatch':
       return 'Chrono montant, tours marqués à la main'
   }
+}
+
+export function copyOf(timer: Timer): Timer {
+  return { ...timer, id: newId(), name: `${timer.name} (copie)` }
 }
 
 export type SegmentKind = 'prepare' | 'work' | 'rest'

@@ -1,0 +1,57 @@
+.wrap {
+  position: relative;
+  border-radius: var(--radius);
+  overflow: hidden;
+}
+
+.actions {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  /* a sliver of the tiles shows past the sliding row on fractional pixel ratios */
+  visibility: hidden;
+  transition: visibility 0s linear var(--transition-ms);
+}
+
+.revealed {
+  visibility: visible;
+  transition-delay: 0s;
+}
+
+.action {
+  /* square tiles, the row height sets the side */
+  aspect-ratio: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text);
+  background: var(--surface-active);
+}
+
+.action + .action {
+  border-left: 1px solid var(--line);
+}
+
+.danger {
+  background: var(--accent);
+  color: var(--bg);
+}
+
+.content {
+  position: relative;
+  display: flex;
+  align-items: stretch;
+  background: var(--surface);
+  touch-action: pan-y;
+}
+
+.sliding {
+  transition: transform var(--transition);
+}
+
+.cover {
+  position: absolute;
+  inset: 0;
+}

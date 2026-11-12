@@ -1,13 +1,25 @@
+import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import Button from '../components/Button.tsx'
+import ConfirmDeleteTimer from '../components/ConfirmDeleteTimer.tsx'
 import Icon from '../components/Icon.tsx'
-import { describe } from '../domain/timer.ts'
+import SwipeRow from '../components/SwipeRow.tsx'
+import { copyOf, describe, type Timer } from '../domain/timer.ts'
 import { useTimers } from '../store/timers.ts'
 import styles from './Home.module.css'
 
 export default function Home() {
   const timers = useTimers((state) => state.timers)
+  const upsert = useTimers((state) => state.upsert)
+  const remove = useTimers((state) => state.remove)
   const navigate = useNavigate()
+  const [swiped, setSwiped] = useState<string | null>(null)
+  const [askDelete, setAskDelete] = useState<Timer | null>(null)
+
+  const confirmDelete = () => {
+    if (askDelete) remove(askDelete.id)
+    setAskDelete(null)
+  }
 
   return (
     <div className="screen">
@@ -27,19 +39,34 @@ export default function Home() {
       ) : (
         <ul className={`${styles.list} grow`}>
           {timers.map((timer) => (
-            <li key={timer.id} className={styles.row}>
-              <Link to={`/lancer/${timer.id}`} className={styles.main}>
-                <span className={styles.name}>{timer.name}</span>
-                <span className="subtle">{describe(timer)}</span>
-              </Link>
-              <button
-                type="button"
-                className={styles.edit}
-                aria-label={`Régler ${timer.name}`}
-                onClick={() => navigate(`/chrono/${timer.id}`)}
+            <li key={timer.id}>
+              <SwipeRow
+                open={swiped === timer.id}
+                onOpenChange={(open) => setSwiped(open ? timer.id : null)}
+                actions={[
+                  {
+                    icon: 'pencil',
+                    label: `Modifier ${timer.name}`,
+                    onClick: () => navigate(`/chrono/${timer.id}`),
+                  },
+                  {
+                    icon: 'copy',
+                    label: `Dupliquer ${timer.name}`,
+                    onClick: () => upsert(copyOf(timer)),
+                  },
+                  {
+                    icon: 'trash',
+                    label: `Supprimer ${timer.name}`,
+                    danger: true,
+                    onClick: () => setAskDelete(timer),
+                  },
+                ]}
               >
-                <Icon name="pencil" size={18} />
-              </button>
+                <Link to={`/lancer/${timer.id}`} className={styles.main} draggable={false}>
+                  <span className={styles.name}>{timer.name}</span>
+                  <span className="subtle">{describe(timer)}</span>
+                </Link>
+              </SwipeRow>
             </li>
           ))}
         </ul>
@@ -51,6 +78,14 @@ export default function Home() {
           Nouveau chrono
         </Button>
       </div>
+
+      {askDelete && (
+        <ConfirmDeleteTimer
+          name={askDelete.name}
+          onConfirm={confirmDelete}
+          onCancel={() => setAskDelete(null)}
+        />
+      )}
     </div>
   )
 }

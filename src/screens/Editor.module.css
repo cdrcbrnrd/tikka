@@ -80,9 +80,3 @@
   background: linear-gradient(to top, var(--bg) 70%, transparent);
 }
 
-.secondary {
-  display: flex;
-  justify-content: center;
-  gap: var(--space-5);
-}
-

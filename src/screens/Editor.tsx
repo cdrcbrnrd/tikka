@@ -2,7 +2,6 @@ import { useMemo, useState } from 'react'
 import { Navigate, useNavigate, useParams } from 'react-router-dom'
 import BackLink from '../components/BackLink.tsx'
 import Button from '../components/Button.tsx'
-import Confirm from '../components/Confirm.tsx'
 import Stepper from '../components/Stepper.tsx'
 import { clock } from '../domain/format.ts'
 import { newId } from '../domain/id.ts'
@@ -26,9 +25,7 @@ export default function Editor() {
 
 function Form({ initial, isNew }: { initial: Timer; isNew: boolean }) {
   const [draft, setDraft] = useState<Timer>(initial)
-  const [askDelete, setAskDelete] = useState(false)
   const upsert = useTimers((state) => state.upsert)
-  const remove = useTimers((state) => state.remove)
   const navigate = useNavigate()
 
   const patch = (changes: Partial<Timer>) => setDraft((current) => ({ ...current, ...changes }) as Timer)
@@ -43,12 +40,6 @@ function Form({ initial, isNew }: { initial: Timer; isNew: boolean }) {
 
   const save = () => {
     upsert(named(draft))
-    navigate('/')
-  }
-
-  const duplicate = () => {
-    const copy = named(draft)
-    upsert({ ...copy, id: newId(), name: `${copy.name} (copie)` })
     navigate('/')
   }
 
@@ -165,30 +156,8 @@ function Form({ initial, isNew }: { initial: Timer; isNew: boolean }) {
         <Button variant="accent" block onClick={save}>
           Enregistrer
         </Button>
-        {!isNew && (
-          <div className={styles.secondary}>
-            <Button variant="ghost" onClick={duplicate}>
-              Dupliquer
-            </Button>
-            <Button variant="ghost" onClick={() => setAskDelete(true)}>
-              Supprimer
-            </Button>
-          </div>
-        )}
       </div>
 
-      {askDelete && (
-        <Confirm
-          title="Supprimer ce chrono ?"
-          detail="Les séances déjà enregistrées dans l’historique restent."
-          confirmLabel="Supprimer"
-          onCancel={() => setAskDelete(false)}
-          onConfirm={() => {
-            remove(draft.id)
-            navigate('/')
-          }}
-        />
-      )}
     </div>
   )
 }

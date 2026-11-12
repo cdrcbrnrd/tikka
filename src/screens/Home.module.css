@@ -7,16 +7,6 @@
   gap: var(--space-3);
 }
 
-.row {
-  display: flex;
-  align-items: stretch;
-  gap: var(--space-2);
-  background: var(--surface);
-  border: 1px solid var(--line);
-  border-radius: var(--radius);
-  overflow: hidden;
-}
-
 .main {
   flex: 1;
   display: flex;
@@ -24,7 +14,6 @@
   gap: var(--space-1);
   padding: var(--space-4);
   min-height: var(--tap);
-  transition: background var(--transition);
 }
 
 .main:active {
@@ -34,19 +23,6 @@
 .name {
   font-size: var(--text-md);
   font-weight: 600;
-}
-
-.edit {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: var(--tap);
-  color: var(--muted);
-  border-left: 1px solid var(--line);
-}
-
-.edit:active {
-  color: var(--text);
 }
 
 .footer {
