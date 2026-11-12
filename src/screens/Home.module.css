@@ -25,6 +25,21 @@
   font-weight: 600;
 }
 
+.option {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  width: 100%;
+  min-height: var(--tap);
+  padding: var(--space-3) var(--space-2) var(--space-4);
+  text-align: left;
+}
+
+.optionText {
+  font-size: var(--text-sm);
+}
+
 .footer {
   position: sticky;
   bottom: 0;

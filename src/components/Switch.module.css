@@ -1,0 +1,32 @@
+.track {
+  position: relative;
+  flex: none;
+  width: 48px;
+  height: 28px;
+  border-radius: var(--radius-pill);
+  background: var(--surface-active);
+  transition: background var(--transition);
+}
+
+.track::after {
+  content: '';
+  position: absolute;
+  top: 4px;
+  left: 4px;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: var(--muted);
+  transition:
+    transform var(--transition),
+    background var(--transition);
+}
+
+.on {
+  background: var(--text);
+}
+
+.on::after {
+  background: var(--bg);
+  transform: translateX(20px);
+}

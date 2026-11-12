@@ -29,7 +29,7 @@ export type Runner = {
 // the display only needs tenths, a state change per frame would re-render for nothing
 const TICK_MS = 100
 
-export function useRunner(timer: Timer): Runner {
+export function useRunner(timer: Timer, ringInSilentMode = false): Runner {
   const segments = useMemo(() => buildSegments(timer), [timer])
   const bounds = useMemo(() => cumulativeBounds(segments), [segments])
   const totalMs = useMemo(() => sumDurations(segments), [segments])
@@ -46,14 +46,14 @@ export function useRunner(timer: Timer): Runner {
   const pausedAt = useRef<number | null>(null)
 
   const start = useCallback(() => {
-    unlockAudio()
+    unlockAudio(ringInSilentMode)
     startedAt.current = Date.now()
     pausedAt.current = null
     cues.reset()
     setLaps([])
     setElapsedMs(0)
     setStatus('running')
-  }, [cues])
+  }, [cues, ringInSilentMode])
 
   const pause = useCallback(() => {
     if (startedAt.current === null) return

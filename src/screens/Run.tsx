@@ -11,6 +11,7 @@ import { releaseAudio } from '../engine/cues.ts'
 import { useRunner } from '../engine/useRunner.ts'
 import { useWakeLock } from '../engine/useWakeLock.ts'
 import { useHistory } from '../store/history.ts'
+import { useSettings } from '../store/settings.ts'
 import { useTimer } from '../store/timers.ts'
 import styles from './Run.module.css'
 
@@ -26,7 +27,8 @@ export default function Run() {
 }
 
 function Session({ timer }: { timer: Timer }) {
-  const runner = useRunner(timer)
+  const ringInSilentMode = useSettings((state) => state.ringInSilentMode)
+  const runner = useRunner(timer, ringInSilentMode)
   const navigate = useNavigate()
   const addSession = useHistory((state) => state.add)
   const startedAt = useRef<string | null>(null)
