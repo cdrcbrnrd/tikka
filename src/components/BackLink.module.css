@@ -1,0 +1,13 @@
+.link {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  min-height: var(--tap);
+  color: var(--muted);
+  font-size: var(--text-sm);
+  transition: color var(--transition);
+}
+
+.link:active {
+  color: var(--text);
+}

@@ -1,0 +1,30 @@
+:root {
+  --bg: #16231c;
+  --surface: #1f3328;
+  --line: #2c4536;
+  --text: #f2eadf;
+  --muted: #9fb0a4;
+  --accent: #ff2e88;
+
+  --radius: 16px;
+  --radius-sm: 10px;
+  --radius-pill: 999px;
+
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 24px;
+  --space-6: 32px;
+  --space-7: 48px;
+
+  --tap: 48px;
+  --transition: 150ms ease;
+
+  --font: ui-rounded, "SF Pro Rounded", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --text-xs: 12px;
+  --text-sm: 14px;
+  --text-md: 16px;
+  --text-lg: 20px;
+  --text-xl: 28px;
+}
