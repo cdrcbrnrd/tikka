@@ -18,24 +18,11 @@ const VIBRATIONS: Record<Cue, number | number[]> = {
 
 let context: AudioContext | null = null
 
-type AudioSession = { type: string }
-
 // iOS only lets audio through once a context has been resumed inside a user gesture
-export function unlockAudio(ringInSilentMode: boolean): void {
-  if (ringInSilentMode) claimPlaybackSession()
+export function unlockAudio(): void {
   context ??= new AudioContext()
   if (context.state === 'suspended') void context.resume()
   tone(440, 0.01, 0)
-}
-
-let claimed = false
-
-// web audio goes out on the ambient channel, which the iPhone silent switch mutes
-function claimPlaybackSession(): void {
-  const session = (navigator as Navigator & { audioSession?: AudioSession }).audioSession
-  if (!session) return
-  session.type = 'playback'
-  claimed = true
 }
 
 export function playCue(cue: Cue): void {
@@ -49,12 +36,6 @@ export function playCue(cue: Cue): void {
 export function releaseAudio(): void {
   const closing = context
   context = null
-  const session = (navigator as Navigator & { audioSession?: AudioSession }).audioSession
-  // back to the default once the session is over, so music apps are not held off the device
-  if (claimed && session) {
-    session.type = 'auto'
-    claimed = false
-  }
   // the end cue lasts about a second, closing right away would cut it off
   setTimeout(() => void closing?.close(), 1200)
 }

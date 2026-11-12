@@ -8,6 +8,7 @@ import { clock, clockTenths, plural, splits } from '../domain/format.ts'
 import { newId } from '../domain/id.ts'
 import type { Timer } from '../domain/timer.ts'
 import { releaseAudio } from '../engine/cues.ts'
+import { useAudioSession } from '../engine/useAudioSession.ts'
 import { useRunner } from '../engine/useRunner.ts'
 import { useWakeLock } from '../engine/useWakeLock.ts'
 import { useHistory } from '../store/history.ts'
@@ -28,13 +29,15 @@ export default function Run() {
 
 function Session({ timer }: { timer: Timer }) {
   const ringInSilentMode = useSettings((state) => state.ringInSilentMode)
-  const runner = useRunner(timer, ringInSilentMode)
+  const runner = useRunner(timer)
   const navigate = useNavigate()
   const addSession = useHistory((state) => state.add)
   const startedAt = useRef<string | null>(null)
   const saved = useRef(false)
 
   useWakeLock(runner.status === 'running')
+  // claimed only once the session is under way, opening a timer should not pause the music
+  useAudioSession(ringInSilentMode && runner.status !== 'idle')
 
   // keeping the audio hardware awake between sessions costs battery for nothing
   useEffect(() => releaseAudio, [])
