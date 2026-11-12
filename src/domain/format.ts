@@ -25,3 +25,18 @@ export function sessionDate(iso: string): string {
 export function sessionTime(iso: string): string {
   return new Date(iso).toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })
 }
+
+export function clockShort(seconds: number): string {
+  if (seconds < 60) return `${seconds} s`
+  const minutes = Math.floor(seconds / 60)
+  const rest = seconds % 60
+  return rest === 0 ? `${minutes} min` : `${minutes} min ${rest} s`
+}
+
+export function plural(count: number, word: string): string {
+  return `${count} ${word}${count > 1 ? 's' : ''}`
+}
+
+export function splits(laps: number[]): number[] {
+  return laps.map((lap, index) => lap - (laps[index - 1] ?? 0))
+}

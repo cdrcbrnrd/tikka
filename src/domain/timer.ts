@@ -1,3 +1,5 @@
+import { clockShort } from './format.ts'
+
 export type TimerKind = 'intervals' | 'emom' | 'countdown' | 'stopwatch'
 
 type Common = {
@@ -66,15 +68,6 @@ export function describe(timer: Timer): string {
     case 'stopwatch':
       return 'Chrono montant, tours marqués à la main'
   }
-}
-
-function clockShort(seconds: number): string {
-  if (seconds % 60 === 0 && seconds >= 60) {
-    const m = seconds / 60
-    return `${m} min`
-  }
-  if (seconds < 60) return `${seconds} s`
-  return `${Math.floor(seconds / 60)} min ${seconds % 60} s`
 }
 
 export type SegmentKind = 'prepare' | 'work' | 'rest'

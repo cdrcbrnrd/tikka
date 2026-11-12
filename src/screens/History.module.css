@@ -72,10 +72,6 @@
   font-weight: 500;
 }
 
-.stopped {
-  color: var(--muted);
-}
-
 .laps {
   list-style: none;
   margin: 0;
@@ -97,11 +93,4 @@
   display: flex;
   justify-content: center;
   padding-top: var(--space-4);
-}
-
-.quiet {
-  color: var(--muted);
-  min-height: var(--tap);
-  padding: 0 var(--space-4);
-  font-size: var(--text-sm);
 }

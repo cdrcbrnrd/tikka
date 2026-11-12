@@ -7,6 +7,6 @@ type Props = ButtonHTMLAttributes<HTMLButtonElement> & {
 }
 
 export default function Button({ variant = 'surface', block, className, ...rest }: Props) {
-  const classes = [styles.button, styles[variant], block ? styles.block : '', className ?? '']
+  const classes = [styles.button, styles[variant], block && styles.block, className]
   return <button type="button" className={classes.filter(Boolean).join(' ')} {...rest} />
 }

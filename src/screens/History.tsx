@@ -1,7 +1,8 @@
 import { useState } from 'react'
 import BackLink from '../components/BackLink.tsx'
+import Button from '../components/Button.tsx'
 import Confirm from '../components/Confirm.tsx'
-import { clock, clockTenths, sessionDate, sessionTime } from '../domain/format.ts'
+import { clock, clockTenths, plural, sessionDate, sessionTime, splits } from '../domain/format.ts'
 import { useHistory, type Session } from '../store/history.ts'
 import styles from './History.module.css'
 
@@ -33,13 +34,15 @@ export default function History() {
             <section key={label} className={styles.day}>
               <h2 className={styles.dayLabel}>{label}</h2>
               <ul className={styles.list}>
-                {entries.map((session) => (
+                {entries.map((session) => {
+                  const hasLaps = session.laps.length > 0
+                  return (
                   <li key={session.id} className={styles.entry}>
                     <button
                       type="button"
-                      className={`${styles.summary} ${session.laps.length === 0 ? styles.flat : ''}`}
-                      aria-expanded={session.laps.length > 0 ? open === session.id : undefined}
-                      disabled={session.laps.length === 0}
+                      className={`${styles.summary} ${hasLaps ? '' : styles.flat}`}
+                      aria-expanded={hasLaps ? open === session.id : undefined}
+                      disabled={!hasLaps}
                       onClick={() => setOpen((current) => (current === session.id ? null : session.id))}
                     >
                       <span className={styles.left}>
@@ -52,26 +55,27 @@ export default function History() {
                       </span>
                     </button>
 
-                    {open === session.id && session.laps.length > 0 && (
+                    {hasLaps && open === session.id && (
                       <ol className={styles.laps}>
-                        {session.laps.map((lap, index) => (
+                        {splits(session.laps).map((split, index) => (
                           <li key={index} className={styles.lap}>
                             <span className="muted">Tour {index + 1}</span>
-                            <span className="digits">{clockTenths(lap - (session.laps[index - 1] ?? 0))}</span>
+                            <span className="digits">{clockTenths(split)}</span>
                           </li>
                         ))}
                       </ol>
                     )}
                   </li>
-                ))}
+                  )
+                })}
               </ul>
             </section>
           ))}
 
           <div className={styles.footer}>
-            <button type="button" className={styles.quiet} onClick={() => setAskClear(true)}>
+            <Button variant="ghost" onClick={() => setAskClear(true)}>
               Vider l’historique
-            </button>
+            </Button>
           </div>
         </div>
       )}
@@ -94,8 +98,8 @@ export default function History() {
 
 function detail(session: Session): string {
   const parts: string[] = []
-  if (session.roundsDone > 0) parts.push(`${session.roundsDone} round${session.roundsDone > 1 ? 's' : ''}`)
-  if (session.laps.length > 0) parts.push(`${session.laps.length} tour${session.laps.length > 1 ? 's' : ''}`)
+  if (session.roundsDone > 0) parts.push(plural(session.roundsDone, 'round'))
+  if (session.laps.length > 0) parts.push(plural(session.laps.length, 'tour'))
   if (!session.completed) parts.push('arrêtée en route')
   return parts.join(' · ')
 }
@@ -116,13 +120,7 @@ function dayLabel(iso: string): string {
   const today = new Date()
   const yesterday = new Date(today)
   yesterday.setDate(today.getDate() - 1)
-  if (sameDay(day, today)) return 'Aujourd’hui'
-  if (sameDay(day, yesterday)) return 'Hier'
+  if (day.toDateString() === today.toDateString()) return 'Aujourd’hui'
+  if (day.toDateString() === yesterday.toDateString()) return 'Hier'
   return sessionDate(iso)
-}
-
-function sameDay(a: Date, b: Date): boolean {
-  return (
-    a.getFullYear() === b.getFullYear() && a.getMonth() === b.getMonth() && a.getDate() === b.getDate()
-  )
 }

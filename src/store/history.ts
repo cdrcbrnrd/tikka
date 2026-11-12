@@ -17,7 +17,6 @@ export type Session = {
 type HistoryState = {
   sessions: Session[]
   add: (session: Session) => void
-  remove: (id: string) => void
   clear: () => void
 }
 
@@ -26,7 +25,6 @@ export const useHistory = create<HistoryState>()(
     (set) => ({
       sessions: [],
       add: (session) => set((state) => ({ sessions: [session, ...state.sessions].slice(0, 200) })),
-      remove: (id) => set((state) => ({ sessions: state.sessions.filter((item) => item.id !== id) })),
       clear: () => set({ sessions: [] }),
     }),
     { name: 'tikka.history', version: 1 },
