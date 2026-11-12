@@ -59,8 +59,14 @@ select {
   display: flex;
   flex-direction: column;
   min-height: 100%;
-  padding: calc(env(safe-area-inset-top) + var(--space-5)) var(--space-4)
-    calc(env(safe-area-inset-bottom) + var(--space-5));
+  padding: calc(env(safe-area-inset-top) + var(--space-5)) var(--space-4) var(--screen-bottom);
+}
+
+.screen-footer {
+  position: sticky;
+  bottom: var(--screen-bottom);
+  padding-top: var(--space-5);
+  background: linear-gradient(to top, var(--bg) 60%, transparent);
 }
 
 .screen-head {

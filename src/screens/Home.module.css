@@ -33,18 +33,8 @@
   width: 100%;
   min-height: var(--tap);
   padding: var(--space-3) var(--space-2) var(--space-4);
-  text-align: left;
-}
-
-.optionText {
   font-size: var(--text-sm);
-}
-
-.footer {
-  position: sticky;
-  bottom: calc(env(safe-area-inset-bottom) + var(--space-5));
-  padding-top: var(--space-5);
-  background: linear-gradient(to top, var(--bg) 60%, transparent);
+  text-align: left;
 }
 
 .headLink {

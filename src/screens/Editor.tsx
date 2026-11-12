@@ -152,7 +152,7 @@ function Form({ initial, isNew }: { initial: Timer; isNew: boolean }) {
         </div>
       </div>
 
-      <div className={styles.actions}>
+      <div className={`screen-footer ${styles.actions}`}>
         <Button variant="accent" block onClick={save}>
           Enregistrer
         </Button>

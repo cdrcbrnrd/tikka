@@ -76,7 +76,7 @@ export default function Home() {
         </ul>
       )}
 
-      <div className={styles.footer}>
+      <div className="screen-footer">
         <button
           type="button"
           role="switch"
@@ -84,7 +84,7 @@ export default function Home() {
           className={styles.option}
           onClick={() => setRingInSilentMode(!ringInSilentMode)}
         >
-          <span className={styles.optionText}>Bip même en silencieux</span>
+          Bip même en silencieux
           <Switch checked={ringInSilentMode} />
         </button>
 

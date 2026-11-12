@@ -21,6 +21,7 @@
   --space-7: 48px;
 
   --tap: 48px;
+  --screen-bottom: calc(env(safe-area-inset-bottom) + var(--space-5));
   --transition: 150ms ease;
 
   --font: -apple-system, BlinkMacSystemFont, "SF Pro Text", system-ui, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
