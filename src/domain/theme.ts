@@ -3,7 +3,6 @@ export type ThemeId = 'foret' | 'nuit' | 'braise' | 'lcd'
 export type Theme = {
   id: ThemeId
   name: string
-  hint: string
   // the run screen draws a watch dial instead of the progress ring
   dial?: boolean
   // the three colours that carry the ambiance, shown as swatches in the picker
@@ -14,26 +13,22 @@ export const THEMES: Theme[] = [
   {
     id: 'foret',
     name: 'Forêt',
-    hint: 'Vert profond, crème, magenta',
     swatch: ['#16231c', '#f2eadf', '#ff2e88'],
   },
   {
     id: 'nuit',
     name: 'Nuit',
-    hint: 'Bleu nuit, brume, orange vif',
     swatch: ['#12161f', '#eef1f7', '#ff6a3d'],
   },
   {
     id: 'lcd',
     name: 'F-91W',
-    hint: 'Boîtier noir, panneau LCD, filet bleu',
     swatch: ['#0f1012', '#deefed', '#c9b673'],
     dial: true,
   },
   {
     id: 'braise',
     name: 'Braise',
-    hint: 'Terre brûlée, sable, menthe',
     swatch: ['#1c1714', '#f4ece3', '#2bd9a0'],
   },
 ]

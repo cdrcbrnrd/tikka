@@ -52,12 +52,6 @@
   border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
 }
 
-.text {
-  display: flex;
-  flex-direction: column;
-  gap: 0.125rem;
-}
-
 .name {
   font-weight: 600;
 }
