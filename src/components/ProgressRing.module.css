@@ -1,7 +1,7 @@
 .wrap {
   position: relative;
   width: 100%;
-  max-width: min(86vw, 340px);
+  max-width: min(86vw, 21.25rem);
   margin: 0 auto;
   aspect-ratio: 1;
 }

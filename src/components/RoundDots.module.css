@@ -6,8 +6,8 @@
 }
 
 .dot {
-  width: 7px;
-  height: 7px;
+  width: 0.4375rem;
+  height: 0.4375rem;
   border-radius: 50%;
   background: var(--line);
   transition: background var(--transition);
@@ -19,5 +19,5 @@
 
 .current {
   background: var(--text);
-  box-shadow: 0 0 0 3px rgb(242 234 223 / 12%);
+  box-shadow: 0 0 0 0.1875rem rgb(242 234 223 / 12%);
 }
