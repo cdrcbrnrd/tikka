@@ -61,18 +61,19 @@ select {
   outline-offset: 2px;
 }
 
+/* the page itself never scrolls: an installed app is only given the foot of the screen
+   once it does, and the bar would then sit elsewhere depending on how full the list is */
 .screen {
   display: flex;
   flex-direction: column;
-  min-height: var(--app-height, 100dvh);
+  height: var(--app-height, 100dvh);
+  overflow: hidden;
   padding: calc(var(--safe-top) + var(--space-5)) var(--space-4) var(--screen-bottom);
 }
 
 .screen-footer {
-  position: sticky;
-  bottom: var(--screen-bottom);
+  flex: none;
   padding-top: var(--space-5);
-  background: linear-gradient(to top, var(--bg) 60%, transparent);
 }
 
 .screen-head {
@@ -100,6 +101,15 @@ select {
 
 .grow {
   flex: 1;
+  /* a flex item refuses to shrink under its content unless it is told it may */
+  min-height: 0;
+  overflow-y: auto;
+  /* a phone draws no scrollbar, and a desktop one would narrow the preview */
+  scrollbar-width: none;
+}
+
+.grow::-webkit-scrollbar {
+  width: 0;
 }
 
 .one-line {
