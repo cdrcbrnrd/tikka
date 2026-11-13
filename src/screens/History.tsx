@@ -46,11 +46,11 @@ export default function History() {
                       onClick={() => setOpen((current) => (current === session.id ? null : session.id))}
                     >
                       <span className={styles.left}>
-                        <span className={`${styles.name} wordmark`}>{session.name}</span>
-                        <span className="subtle">{detail(session)}</span>
+                        <span className={`${styles.name} one-line`}>{session.name}</span>
+                        <span className="subtle one-line">{detail(session)}</span>
                       </span>
                       <span className={styles.right}>
-                        <span className={`${styles.duration} digits readout segments`}>{clock(session.elapsedMs / 1000)}</span>
+                        <span className={`${styles.duration} digits`}>{clock(session.elapsedMs / 1000)}</span>
                         <span className={`subtle digits ${styles.hour}`}>{sessionTime(session.startedAt)}</span>
                       </span>
                     </button>
@@ -72,7 +72,7 @@ export default function History() {
             </section>
           ))}
 
-          <div className={styles.footer}>
+          <div className={`screen-footer ${styles.footer}`}>
             <Button variant="ghost" onClick={() => setAskClear(true)}>
               Vider l’historique
             </Button>

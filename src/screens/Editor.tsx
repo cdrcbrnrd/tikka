@@ -5,9 +5,16 @@ import Button from '../components/Button.tsx'
 import Stepper from '../components/Stepper.tsx'
 import { clock } from '../domain/format.ts'
 import { newId } from '../domain/id.ts'
-import { hasDial } from '../domain/theme.ts'
-import { blankTimer, defaultName, KIND_HINTS, KIND_LABELS, type Timer, type TimerKind } from '../domain/timer.ts'
-import { useSettings } from '../store/settings.ts'
+import {
+  blankTimer,
+  defaultName,
+  KIND_HINTS,
+  KIND_LABELS,
+  named,
+  NAME_MAX,
+  type Timer,
+  type TimerKind,
+} from '../domain/timer.ts'
 import { useTimers } from '../store/timers.ts'
 import styles from './Editor.module.css'
 
@@ -29,17 +36,11 @@ function Form({ initial, isNew }: { initial: Timer; isNew: boolean }) {
   const [draft, setDraft] = useState<Timer>(initial)
   const upsert = useTimers((state) => state.upsert)
   const navigate = useNavigate()
-  const dial = hasDial(useSettings((state) => state.theme))
 
   const patch = (changes: Partial<Timer>) => setDraft((current) => ({ ...current, ...changes }) as Timer)
 
   const changeKind = (kind: TimerKind) =>
     setDraft((current) => ({ ...blankTimer(kind, current.id), name: current.name, prepare: current.prepare }))
-
-  const named = (timer: Timer) => {
-    const name = timer.name.trim()
-    return { ...timer, name: name === '' ? defaultName(timer) : name }
-  }
 
   const save = () => {
     upsert(named(draft))
@@ -60,9 +61,10 @@ function Form({ initial, isNew }: { initial: Timer; isNew: boolean }) {
           </label>
           <input
             id="nom"
-            className={`${styles.name} wordmark`}
+            className={styles.name}
             type="text"
             value={draft.name}
+            maxLength={NAME_MAX}
             placeholder={defaultName(draft)}
             onChange={(event) => patch({ name: event.target.value })}
           />
@@ -79,8 +81,8 @@ function Form({ initial, isNew }: { initial: Timer; isNew: boolean }) {
                 aria-pressed={draft.kind === kind}
                 onClick={() => changeKind(kind)}
               >
-                <span className={`${styles.kindName} wordmark`}>{KIND_LABELS[kind]}</span>
-                <span className="subtle">{KIND_HINTS[kind]}</span>
+                <span className={styles.kindName}>{KIND_LABELS[kind]}</span>
+                <span className="subtle one-line">{KIND_HINTS[kind]}</span>
               </button>
             ))}
           </div>
@@ -90,7 +92,7 @@ function Form({ initial, isNew }: { initial: Timer; isNew: boolean }) {
           <span className={styles.groupLabel}>Réglages</span>
           <div className={styles.fields}>
             <Duration
-              label={dial ? 'Prépa' : 'Préparation'}
+              label="Préparation"
               value={draft.prepare}
               min={0}
               max={120}

@@ -2,14 +2,14 @@
 
 Tout ce qui se voit à l'écran sort de `src/styles/tokens.css`. Un écran ou un composant
 ne pose jamais une couleur, un rayon ou un espacement en dur : il appelle un jeton. C'est
-ce qui fait qu'une ambiance se change en une ligne et que les quatre se ressemblent sans
+ce qui fait qu'une ambiance se change en une ligne et que les trois se ressemblent sans
 être identiques.
 
 Deux familles :
 
 - **les couleurs**, redéfinies par chaque ambiance sur `[data-theme=...]` ;
 - **le reste** — espace, rayons, tailles, typo —, déclaré une seule fois sur `:root` et
-  commun aux quatre ambiances.
+  commun aux trois ambiances.
 
 ## Couleurs
 
@@ -28,53 +28,27 @@ Huit jetons portent une ambiance complète. Chacun a un rôle, pas une teinte :
 | `--on-accent` | ce qui s'écrit **sur** l'accent |
 
 `--surface-ring` est la soupape : une ambiance qui ne remplit pas ses cartes les dessine
-avec un filet au lieu d'une surcharge locale. S'il faut écrire une règle `[data-theme=...]`
+avec un filet au lieu d'une surcharge locale. Aucune des trois ne l'allume aujourd'hui —
+il est transparent partout, et les cinq `box-shadow` qui le lisent ne peignent rien. S'il faut écrire une règle `[data-theme=...]`
 dans un module, c'est presque toujours qu'une valeur est dans la mauvaise case.
 
-### Les quatre ambiances
+### Les trois ambiances
 
-| | `foret` (défaut) | `nuit` | `braise` | `lcd` (F-91W) |
-| --- | --- | --- | --- | --- |
-| `--bg` | `#16231c` | `#12161f` | `#1c1714` | `#0f1012` |
-| `--surface` | `#1f3328` | `#1b2130` | `#2a221d` | `#0f1012` |
-| `--surface-active` | `#26402f` | `#232b3d` | `#342a23` | `#191b1f` |
-| `--surface-ring` | transparent | transparent | transparent | `var(--line)` |
-| `--line` | `#2c4536` | `#2a3245` | `#3b3029` | `#39538b` |
-| `--text` | `#f2eadf` | `#eef1f7` | `#f4ece3` | `#deefed` |
-| `--muted` | `#9fb0a4` | `#99a3b8` | `#b3a294` | `#8b9ea4` |
-| `--accent` | `#ff2e88` | `#ff6a3d` | `#2bd9a0` | `#c9b673` |
-| `--on-accent` | `#1a0210` | `#1a0a04` | `#04190f` | `#0f1012` |
+| | `foret` (défaut) | `nuit` | `braise` |
+| --- | --- | --- | --- |
+| `--bg` | `#16231c` | `#12161f` | `#1c1714` |
+| `--surface` | `#1f3328` | `#1b2130` | `#2a221d` |
+| `--surface-active` | `#26402f` | `#232b3d` | `#342a23` |
+| `--surface-ring` | transparent | transparent | transparent |
+| `--line` | `#2c4536` | `#2a3245` | `#3b3029` |
+| `--text` | `#f2eadf` | `#eef1f7` | `#f4ece3` |
+| `--muted` | `#9fb0a4` | `#99a3b8` | `#b3a294` |
+| `--accent` | `#ff2e88` | `#ff6a3d` | `#2bd9a0` |
+| `--on-accent` | `#1a0210` | `#1a0a04` | `#04190f` |
 
 Toutes sont sombres : l'app se regarde par terre à côté du rameur, souvent le soir. Chaque
 ambiance pose un fond froid ou chaud et prend l'accent dans l'autre famille, pour que le
 bouton d'action se détache sans éclairer l'écran.
-
-### Les jetons propres au F-91W
-
-`lcd` ne se contente pas d'une palette : elle imite une montre, avec un boîtier, un panneau
-d'affichage et des lignes imprimées. D'où cinq jetons qu'elle seule déclare — et comme ils
-n'existent nulle part ailleurs, on ne les lit que derrière un `[data-theme='lcd']`, dans
-`global.css` ou dans un module. C'est l'exception à la règle « pas de surcharge
-d'ambiance » : la valeur est bien dans la bonne case, elle n'a simplement pas d'équivalent
-dans les trois autres ambiances.
-
-| Jeton | À quoi il sert |
-| --- | --- |
-| `--panel` | le fond de la vitre où se lit un chiffre |
-| `--panel-ink` | le chiffre lui-même, posé sur la vitre |
-| `--panel-ghost` | les segments éteints, visibles mais pas lus |
-| `--face-red` | le rouge imprimé du cadran |
-| `--face-white` | le blanc imprimé — le nom du modèle, les titres |
-
-Le fond et la surface sont la même valeur : une carte n'est pas un aplat posé sur l'écran,
-c'est le boîtier, reconnu à son cadre imprimé. `--surface-ring` fait le reste.
-
-Qui s'en sert : `--panel`, `--panel-ink` et `--panel-ghost` restent dans le cadran —
-`WatchFace` et la classe globale `.readout`. `--face-white` est le plus répandu, il repeint
-tout ce qui est imprimé sur le boîtier plutôt qu'affiché derrière une vitre : les titres,
-le nom de l'app, les liens d'en-tête, les boutons discrets, le pas du `Stepper`.
-`--face-red` ne sert qu'à deux endroits, le trait rouge du cadran et le fond du bouton de
-suppression d'une ligne.
 
 Une ambiance de plus veut dire deux fichiers : la fiche dans `src/domain/theme.ts` — avec
 ses trois pastilles `swatch`, qui reprennent `--bg`, `--text` et `--accent` — et le bloc
@@ -98,7 +72,7 @@ tout l'ensemble, texte et gouttières compris.
 
 ```
 --radius       1rem      cartes, modales, champs
---radius-sm    0.625rem  petits blocs, vitres du cadran
+--radius-sm    0.625rem  petits blocs
 --radius-pill  999px     pastilles, tags, boutons ronds
 ```
 
@@ -120,7 +94,7 @@ ses repères.
 --safe-top        env(safe-area-inset-top)
 --safe-bottom     env(safe-area-inset-bottom)
 --screen-gap      la bande laissée sous la vue, mesurée en JS par useAppHeight
---screen-bottom   --safe-bottom moins cette bande, jamais négatif
+--screen-bottom   --safe-bottom moins cette bande, avec un plancher à --space-4
 ```
 
 Un écran se mesure en `var(--app-height, 100dvh)`, jamais en `100%` ni en `vh` : l'app
@@ -134,7 +108,9 @@ iPhone 11, soit exactement la safe area du haut. Cette bande dégage déjà l'in
 d'accueil, donc `useAppHeight` la mesure dans `--screen-gap` et `--screen-bottom` la déduit
 de la safe area pour ne pas la payer deux fois. La mesure n'est retenue que si elle égale
 cette safe area du haut : un onglet et ses barres d'outils, un écran tourné ou une fenêtre
-de bureau donnent un écart quelconque, et la bande retombe à zéro.
+de bureau donnent un écart quelconque, et la bande retombe à zéro. Un plancher à
+`--space-4` garde enfin la barre du bas à distance du bord quand il n'y a aucune safe
+area à dépenser — le navigateur, essentiellement.
 
 Le navigateur, lui, ne connaît aucune safe area : une recette à 414 × 896 étalerait donc la
 page 82 px plus haut que le téléphone. `src/dev/safeAreaPreview.ts` pose les valeurs d'un
@@ -157,10 +133,6 @@ Les cinq tailles reprennent les styles de texte d'iOS — footnote, subheadline,
 title 2, large title. Les chiffres qui défilent passent par `.digits`, qui fixe la chasse
 pour que le chrono ne tremble pas entre deux secondes.
 
-Les deux fontes à segments, `Segments` (DSEG7, les chiffres) et `SegmentsText` (DSEG14, les
-lettres), sont locales, déclarées dans `global.css` et préchargées par `useTheme`. Elles ne
-servent qu'à l'ambiance `lcd`.
-
 ## Mouvement
 
 ```
@@ -169,11 +141,3 @@ servent qu'à l'ambiance `lcd`.
 
 Valeur unique, et `prefers-reduced-motion` coupe transitions et animations pour tout le
 monde dans `global.css`.
-
-## Le jeton local
-
-`--readout-gutter` est la seule variable qu'un composant redéfinit chez lui : elle règle la
-marge intérieure d'une vitre `.readout` selon l'endroit — collée aux chiffres dans le
-`Stepper`, respirant dans l'historique. Le défaut est `var(--space-2)`, écrit sur place dans
-le `var()`. C'est le modèle à suivre si un autre réglage local devient nécessaire : un
-paramètre lu par une classe globale, pas une surcharge d'ambiance.

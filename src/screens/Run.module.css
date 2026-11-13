@@ -14,9 +14,6 @@
 .name {
   font-size: var(--text-sm);
   color: var(--muted);
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
 }
 
 .stage {
@@ -140,23 +137,4 @@
   width: 100%;
   max-height: 34vh;
   overflow-y: auto;
-}
-
-:global([data-theme='lcd']) .nextTag,
-:global([data-theme='lcd']) .phase {
-  color: var(--accent);
-}
-
-:global([data-theme='lcd']) .nextPhase {
-  color: var(--face-white);
-  font-size: var(--text-sm);
-  font-weight: 700;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-}
-
-/* the dial already carries the name and the round count */
-:global([data-theme='lcd']) .name,
-:global([data-theme='lcd']) .rounds {
-  display: none;
 }

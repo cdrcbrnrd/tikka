@@ -1,19 +1,12 @@
 .wrap {
+  position: relative;
   border-radius: var(--radius);
   overflow: hidden;
 }
 
-/* content and actions sit side by side, nothing is painted behind the row */
-.track {
-  display: flex;
-  transition: transform var(--transition);
-}
-
 .content {
   position: relative;
-  flex: 0 0 100%;
   display: flex;
-  border-radius: var(--radius);
   background: var(--surface);
   box-shadow: inset 0 0 0 1px var(--surface-ring);
   touch-action: pan-y;
@@ -24,15 +17,19 @@
   inset: 0;
 }
 
+/* the panel slides over the row rather than pushing it, so the name stays readable */
 .actions {
-  flex: none;
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 100%;
   display: flex;
+  transition: transform var(--transition);
 }
 
 .action {
-  /* square tiles, the row height sets the side */
+  width: var(--tap);
   height: 100%;
-  aspect-ratio: 1;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -47,9 +44,4 @@
 .danger {
   background: var(--accent);
   color: var(--on-accent);
-}
-
-:global([data-theme='lcd']) .danger {
-  background: var(--face-red);
-  color: var(--face-white);
 }

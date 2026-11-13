@@ -22,18 +22,16 @@ type Props = {
 type Gesture = { x: number; y: number; offset: number; width: number; axis: 'none' | 'x' | 'y' }
 
 export default function SwipeRow({ actions, open, onOpenChange, children }: Props) {
-  const track = useRef<HTMLDivElement>(null)
   const panel = useRef<HTMLDivElement>(null)
   const gesture = useRef<Gesture | null>(null)
   const offset = useRef(0)
   const swallowClick = useRef(false)
 
-  // the square tiles take their side from the row height, so they overflow the panel box
-  const width = () => panel.current?.scrollWidth ?? 0
+  const width = () => panel.current?.offsetWidth ?? 0
 
   // the gesture writes the transform straight to the node, a render per pointermove lands a frame late
   const slide = (to: number, animated: boolean) => {
-    const node = track.current
+    const node = panel.current
     if (!node || to === offset.current) return
     node.style.transition = animated ? '' : 'none'
     node.style.transform = `translate3d(${-to}px, 0, 0)`
@@ -97,41 +95,39 @@ export default function SwipeRow({ actions, open, onOpenChange, children }: Prop
 
   return (
     <div className={styles.wrap}>
-      <div ref={track} className={styles.track}>
-        <div
-          className={styles.content}
-          onPointerDown={onPointerDown}
-          onPointerMove={onPointerMove}
-          onPointerUp={onPointerUp}
-          onPointerCancel={onPointerUp}
-          onClickCapture={onClickCapture}
-        >
-          {children}
-          {open && (
-            <button
-              type="button"
-              className={styles.cover}
-              aria-label="Fermer les actions"
-              onClick={() => onOpenChange(false)}
-            />
-          )}
-        </div>
-        <div className={styles.actions} ref={panel} inert={!open}>
-          {actions.map((action) => (
-            <button
-              key={action.label}
-              type="button"
-              className={`${styles.action} ${action.danger ? styles.danger : ''}`}
-              aria-label={action.label}
-              onClick={() => {
-                onOpenChange(false)
-                action.onClick()
-              }}
-            >
-              <Icon name={action.icon} size={32} />
-            </button>
-          ))}
-        </div>
+      <div
+        className={styles.content}
+        onPointerDown={onPointerDown}
+        onPointerMove={onPointerMove}
+        onPointerUp={onPointerUp}
+        onPointerCancel={onPointerUp}
+        onClickCapture={onClickCapture}
+      >
+        {children}
+        {open && (
+          <button
+            type="button"
+            className={styles.cover}
+            aria-label="Fermer les actions"
+            onClick={() => onOpenChange(false)}
+          />
+        )}
+      </div>
+      <div className={styles.actions} ref={panel} inert={!open}>
+        {actions.map((action) => (
+          <button
+            key={action.label}
+            type="button"
+            className={`${styles.action} ${action.danger ? styles.danger : ''}`}
+            aria-label={action.label}
+            onClick={() => {
+              onOpenChange(false)
+              action.onClick()
+            }}
+          >
+            <Icon name={action.icon} size={32} />
+          </button>
+        ))}
       </div>
     </div>
   )

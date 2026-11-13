@@ -52,14 +52,3 @@
   min-width: var(--tap);
   min-height: var(--tap);
 }
-
-:global([data-theme='lcd']) .total {
-  font-size: var(--text-xs);
-}
-
-/* the two header links read as the pushers on the side of the case */
-:global([data-theme='lcd']) .headLink {
-  color: var(--face-white);
-  border: 1px solid var(--line);
-  border-radius: var(--radius-sm);
-}

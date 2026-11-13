@@ -49,15 +49,3 @@
 .ghost:active:not(:disabled) {
   color: var(--text);
 }
-
-:global([data-theme='lcd']) .button {
-  border-radius: var(--radius-sm);
-  font-size: var(--text-sm);
-  font-weight: 700;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-}
-
-:global([data-theme='lcd']) .ghost {
-  color: var(--face-white);
-}

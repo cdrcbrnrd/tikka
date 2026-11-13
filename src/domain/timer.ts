@@ -25,11 +25,15 @@ export const KIND_LABELS: Record<TimerKind, string> = {
 }
 
 export const KIND_HINTS: Record<TimerKind, string> = {
-  intervals: 'Effort et repos qui alternent, pour le rameur et les complexes',
-  emom: 'Un top à chaque période, pendant plusieurs rounds',
-  countdown: 'Une seule durée qui descend, pour un AMRAP',
-  stopwatch: 'Compte à l’endroit, avec des tours marqués à la main',
+  intervals: 'Effort et repos qui alternent',
+  emom: 'Un top à chaque période',
+  countdown: 'Une durée qui descend',
+  stopwatch: 'Compte à l’endroit, tours à la main',
 }
+
+// a card holds the name on one line beside its total: the field stops the athlete there,
+// a generated name stays whole rather than lying about a duration it cut in half
+export const NAME_MAX = 24
 
 export function blankTimer(kind: TimerKind, id: string): Timer {
   const common = { id, name: '', prepare: 10 }
@@ -61,13 +65,13 @@ export function defaultName(timer: Timer): string {
 export function describe(timer: Timer): string {
   switch (timer.kind) {
     case 'intervals':
-      return `${timer.rounds} séries · ${clockShort(timer.work)} d’effort · ${clockShort(timer.rest)} de repos`
+      return `${timer.rounds} séries · ${clockShort(timer.work)} / ${clockShort(timer.rest)}`
     case 'emom':
       return `${timer.rounds} rounds · période de ${clockShort(timer.period)}`
     case 'countdown':
       return `${clockShort(timer.duration)} en comptant à rebours`
     case 'stopwatch':
-      return 'Chrono montant, tours marqués à la main'
+      return 'Chrono montant, tours à la main'
   }
 }
 
@@ -80,6 +84,11 @@ export function totalShort(timer: Timer): Total | null {
   const seconds = segments.reduce((total, segment) => total + (segment.duration ?? 0), 0)
   if (seconds < 60) return { value: String(seconds), unit: 's' }
   return { value: String(Math.round(seconds / 60)), unit: 'min' }
+}
+
+export function named(timer: Timer): Timer {
+  const typed = timer.name.trim()
+  return { ...timer, name: typed === '' ? defaultName(timer) : typed }
 }
 
 export function copyOf(timer: Timer): Timer {

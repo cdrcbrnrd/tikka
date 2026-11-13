@@ -4,17 +4,14 @@ import BackLink from '../components/BackLink.tsx'
 import Button from '../components/Button.tsx'
 import ProgressRing from '../components/ProgressRing.tsx'
 import RoundDots from '../components/RoundDots.tsx'
-import WatchFace from '../components/WatchFace.tsx'
 import { clock, clockTenths, plural, splits } from '../domain/format.ts'
 import { newId } from '../domain/id.ts'
-import { KIND_LABELS, type Timer } from '../domain/timer.ts'
+import type { Timer } from '../domain/timer.ts'
 import { releaseAudio } from '../engine/cues.ts'
 import { useAudioSession } from '../engine/useAudioSession.ts'
 import { useRunner } from '../engine/useRunner.ts'
 import { useWakeLock } from '../engine/useWakeLock.ts'
 import { useHistory } from '../store/history.ts'
-import { hasDial } from '../domain/theme.ts'
-import { useSettings } from '../store/settings.ts'
 import { useTimer } from '../store/timers.ts'
 import styles from './Run.module.css'
 
@@ -32,7 +29,6 @@ export default function Run() {
 function Session({ timer }: { timer: Timer }) {
   const runner = useRunner(timer)
   const navigate = useNavigate()
-  const dial = hasDial(useSettings((state) => state.theme))
   const addSession = useHistory((state) => state.add)
   const startedAt = useRef<string | null>(null)
   const saved = useRef(false)
@@ -86,7 +82,7 @@ function Session({ timer }: { timer: Timer }) {
         {runner.status === 'idle' || runner.status === 'done' ? (
           <BackLink to="/" label="Mes chronos" />
         ) : (
-          <span className={styles.name}>{timer.name}</span>
+          <span className={`${styles.name} one-line`}>{timer.name}</span>
         )}
         {runner.rounds > 1 && runner.status !== 'done' && (
           <span className={`subtle digits ${styles.rounds}`}>
@@ -101,7 +97,7 @@ function Session({ timer }: { timer: Timer }) {
             <span className={styles.phase}>
               {runner.completed ? 'Séance terminée' : 'Séance arrêtée'}
             </span>
-            <span className={`${styles.summaryTime} digits readout segments`}>{clock(runner.sessionMs / 1000)}</span>
+            <span className={`${styles.summaryTime} digits`}>{clock(runner.sessionMs / 1000)}</span>
             {runner.rounds > 0 && (
               <span className="subtle">
                 {plural(runner.round, 'round')} sur {runner.rounds}
@@ -112,28 +108,13 @@ function Session({ timer }: { timer: Timer }) {
         </div>
       ) : (
         <div className={styles.stage}>
-          {dial ? (
-            <WatchFace
-              model={timer.name}
-              kind={KIND_LABELS[timer.kind]}
-              phase={runner.segment?.kind === 'prepare' ? 'Prepa' : phase}
-              round={runner.round}
-              rounds={runner.rounds}
-              time={time}
-              progress={runner.segmentProgress}
-              urgent={urgent}
-              badge={runner.openEnded ? String(runner.laps.length) : clock(Math.ceil(totalLeft / 1000))}
-              openEnded={runner.openEnded}
-            />
-          ) : (
-            <ProgressRing progress={runner.segmentProgress} tone={tone}>
-              <span className={styles.phase}>{phase}</span>
-              <span className={`${styles.time} digits ${urgent ? styles.urgent : ''}`}>{time}</span>
-              {!runner.openEnded && (
-                <span className="subtle digits">{clock(Math.ceil(totalLeft / 1000))} au total</span>
-              )}
-            </ProgressRing>
-          )}
+          <ProgressRing progress={runner.segmentProgress} tone={tone}>
+            <span className={styles.phase}>{phase}</span>
+            <span className={`${styles.time} digits ${urgent ? styles.urgent : ''}`}>{time}</span>
+            {!runner.openEnded && (
+              <span className="subtle digits">{clock(Math.ceil(totalLeft / 1000))} au total</span>
+            )}
+          </ProgressRing>
 
           <div className={styles.under}>
             <RoundDots round={runner.round} rounds={runner.rounds} />
@@ -143,7 +124,7 @@ function Session({ timer }: { timer: Timer }) {
                 <span className={styles.nextPhase}>
                   {runner.nextSegment.label}
                   {runner.nextSegment.duration !== null && (
-                    <span className={`digits segments ${styles.nextTime}`}>{clock(runner.nextSegment.duration)}</span>
+                    <span className={`digits ${styles.nextTime}`}>{clock(runner.nextSegment.duration)}</span>
                   )}
                 </span>
               </div>
@@ -155,7 +136,7 @@ function Session({ timer }: { timer: Timer }) {
         </div>
       )}
 
-      <div className={styles.controls}>
+      <div className={`screen-footer ${styles.controls}`}>
         {runner.status === 'idle' && (
           <Button variant="accent" block onClick={onStart}>
             Démarrer

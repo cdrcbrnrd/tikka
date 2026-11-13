@@ -55,12 +55,3 @@
 .name {
   font-weight: 600;
 }
-
-:global([data-theme='lcd']) .label {
-  color: var(--accent);
-}
-
-:global([data-theme='lcd']) .themeOn {
-  background: var(--surface-active);
-  border-color: var(--accent);
-}

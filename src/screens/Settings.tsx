@@ -31,7 +31,7 @@ export default function Settings() {
                 <span key={colour} className={styles.chip} style={{ background: colour }} />
               ))}
             </span>
-            <span className={`${styles.name} wordmark`}>{item.name}</span>
+            <span className={styles.name}>{item.name}</span>
           </button>
         ))}
       </div>
