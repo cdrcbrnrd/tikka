@@ -71,8 +71,20 @@ select {
 .screen-footer {
   position: sticky;
   bottom: var(--screen-bottom);
-  padding-top: var(--space-5);
-  background: linear-gradient(to top, var(--bg) 60%, transparent);
+  /* opaque behind the button, then a long fade so the list dissolves instead of stopping */
+  padding-top: var(--space-7);
+  background: linear-gradient(to top, var(--bg) calc(100% - var(--space-7)), transparent);
+}
+
+/* the bar leaves a strip of screen under it, and the list would scroll through it */
+.screen-footer::after {
+  content: '';
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  height: var(--screen-bottom);
+  background: var(--bg);
 }
 
 .screen-head {
