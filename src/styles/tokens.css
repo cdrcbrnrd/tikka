@@ -73,8 +73,10 @@
   /* Apple's control sizes are points, not text: they do not follow the root scale */
   --tap: 48px;
   --control: 56px;
+  --safe-top: env(safe-area-inset-top);
+  --safe-bottom: env(safe-area-inset-bottom);
   /* the band below the view already clears the home indicator, do not count it twice */
-  --screen-bottom: max(0px, env(safe-area-inset-bottom) - var(--screen-gap, 0px));
+  --screen-bottom: max(0px, var(--safe-bottom) - var(--screen-gap, 0px));
   --transition: 150ms ease;
 
   --font: -apple-system, BlinkMacSystemFont, "SF Pro Text", system-ui, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;

@@ -1,6 +1,6 @@
 /* the run screen has no title, its header sits closer to the top */
 .screen {
-  padding-top: calc(env(safe-area-inset-top) + var(--space-4));
+  padding-top: calc(var(--safe-top) + var(--space-4));
 }
 
 .head {

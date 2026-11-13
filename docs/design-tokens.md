@@ -117,14 +117,17 @@ ses repères.
 
 ```
 --app-height      la hauteur utile, écrite en JS par useAppHeight
+--safe-top        env(safe-area-inset-top)
+--safe-bottom     env(safe-area-inset-bottom)
 --screen-gap      la bande laissée sous la vue, mesurée en JS par useAppHeight
---screen-bottom   env(safe-area-inset-bottom) moins cette bande, jamais négatif
+--screen-bottom   --safe-bottom moins cette bande, jamais négatif
 ```
 
 Un écran se mesure en `var(--app-height, 100dvh)`, jamais en `100%` ni en `vh` : l'app
 installée reçoit une hauteur périmée au premier affichage, `dvh` ne sert que de repli. Ce
-qui se colle en bas se cale sur `--screen-bottom`, et le haut passe par
-`env(safe-area-inset-top)`.
+qui se colle en bas se cale sur `--screen-bottom`, et le haut sur `--safe-top`. Les deux
+`env()` ne sont lus qu'ici : un module ne les appelle jamais en direct, sinon la recette ne
+peut plus les simuler.
 
 L'app installée reçoit une vue qui s'arrête avant le bord bas de l'écran — 48 px sur un
 iPhone 11, soit exactement la safe area du haut. Cette bande dégage déjà l'indicateur
@@ -132,6 +135,12 @@ d'accueil, donc `useAppHeight` la mesure dans `--screen-gap` et `--screen-bottom
 de la safe area pour ne pas la payer deux fois. La mesure n'est retenue que si elle égale
 cette safe area du haut : un onglet et ses barres d'outils, un écran tourné ou une fenêtre
 de bureau donnent un écart quelconque, et la bande retombe à zéro.
+
+Le navigateur, lui, ne connaît aucune safe area : une recette à 414 × 896 étalerait donc la
+page 82 px plus haut que le téléphone. `src/dev/safeAreaPreview.ts` pose les valeurs d'un
+iPhone 11 — 48 en haut, 34 en bas — sur `--safe-top` et `--safe-bottom`, et seulement là où
+`env()` répond zéro : un vrai appareil garde les siennes. Le module n'est importé que si
+`import.meta.env.DEV`, donc le build publié ne le contient pas.
 
 ## Typographie
 
