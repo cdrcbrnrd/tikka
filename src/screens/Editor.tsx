@@ -19,6 +19,7 @@ import { useTimers } from '../store/timers.ts'
 import styles from './Editor.module.css'
 
 const KINDS: TimerKind[] = ['intervals', 'emom', 'countdown', 'stopwatch']
+const DURATION_STEP = 15
 
 export default function Editor() {
   const { id } = useParams()
@@ -104,7 +105,7 @@ function Form({ initial, isNew }: { initial: Timer; isNew: boolean }) {
                 <Duration
                   label="Effort"
                   value={draft.work}
-                  min={5}
+                  min={DURATION_STEP}
                   max={3600}
                   onChange={(work) => patch({ work })}
                 />
@@ -130,7 +131,7 @@ function Form({ initial, isNew }: { initial: Timer; isNew: boolean }) {
                 <Duration
                   label="Période"
                   value={draft.period}
-                  min={10}
+                  min={DURATION_STEP}
                   max={600}
                   onChange={(period) => patch({ period })}
                 />
@@ -148,7 +149,7 @@ function Form({ initial, isNew }: { initial: Timer; isNew: boolean }) {
               <Duration
                 label="Durée"
                 value={draft.duration}
-                min={10}
+                min={DURATION_STEP}
                 max={7200}
                 onChange={(duration) => patch({ duration })}
               />
@@ -189,8 +190,9 @@ function Duration({ label, value, min, max, onChange }: DurationProps) {
   )
 }
 
-function durationStep(value: number): number {
-  if (value < 60) return 5
-  if (value < 300) return 15
-  return 60
+// a saved duration may sit off the grid, the first press lands on it instead of past it
+function durationStep(value: number, direction: 1 | -1): number {
+  const offGrid = value % DURATION_STEP
+  if (offGrid === 0) return DURATION_STEP
+  return direction === 1 ? DURATION_STEP - offGrid : offGrid
 }

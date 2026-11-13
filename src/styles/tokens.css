@@ -55,8 +55,8 @@
   --control: 56px;
   --safe-top: env(safe-area-inset-top);
   --safe-bottom: env(safe-area-inset-bottom);
-  /* the band below the view already clears the home indicator, do not count it twice */
-  --screen-bottom: max(0px, max(var(--space-4), var(--safe-bottom)) - var(--screen-gap, 0px));
+  /* a floor, because the installed app sometimes reports no safe area at all */
+  --screen-bottom: max(var(--space-4), var(--safe-bottom));
   --transition: 150ms ease;
 
   --font: -apple-system, BlinkMacSystemFont, "SF Pro Text", system-ui, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;

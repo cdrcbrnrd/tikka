@@ -93,8 +93,7 @@ ses repères.
 --app-height      la hauteur utile, écrite en JS par useAppHeight
 --safe-top        env(safe-area-inset-top)
 --safe-bottom     env(safe-area-inset-bottom)
---screen-gap      la bande laissée sous la vue, mesurée en JS par useAppHeight
---screen-bottom   --safe-bottom moins cette bande, avec un plancher à --space-4
+--screen-bottom   --safe-bottom, avec un plancher à --space-4
 ```
 
 Un écran se mesure en `var(--app-height, 100dvh)`, jamais en `100%` ni en `vh` : l'app
@@ -103,14 +102,11 @@ qui se colle en bas se cale sur `--screen-bottom`, et le haut sur `--safe-top`. 
 `env()` ne sont lus qu'ici : un module ne les appelle jamais en direct, sinon la recette ne
 peut plus les simuler.
 
-L'app installée reçoit une vue qui s'arrête avant le bord bas de l'écran — 48 px sur un
-iPhone 11, soit exactement la safe area du haut. Cette bande dégage déjà l'indicateur
-d'accueil, donc `useAppHeight` la mesure dans `--screen-gap` et `--screen-bottom` la déduit
-de la safe area pour ne pas la payer deux fois. La mesure n'est retenue que si elle égale
-cette safe area du haut : un onglet et ses barres d'outils, un écran tourné ou une fenêtre
-de bureau donnent un écart quelconque, et la bande retombe à zéro. Un plancher à
-`--space-4` garde enfin la barre du bas à distance du bord quand il n'y a aucune safe
-area à dépenser — le navigateur, essentiellement.
+L'app installée déclare parfois une safe area nulle alors qu'elle en a une, et sa vue
+s'arrête parfois avant le bord bas de l'écran : deux comportements observés sur un même
+iPhone selon la façon dont l'icône a été posée. D'où le plancher — `--screen-bottom` ne
+descend jamais sous `--space-4`, quoi que raconte le téléphone, et aucune barre ne se
+retrouve collée au verre.
 
 Le navigateur, lui, ne connaît aucune safe area : une recette à 414 × 896 étalerait donc la
 page 82 px plus haut que le téléphone. `src/dev/safeAreaPreview.ts` pose les valeurs d'un

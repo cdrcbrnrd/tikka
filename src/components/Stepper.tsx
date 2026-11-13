@@ -8,7 +8,7 @@ type Props = {
   max: number
   onChange: (value: number) => void
   format?: (value: number) => string
-  stepFor?: (value: number) => number
+  stepFor?: (value: number, direction: 1 | -1) => number
 }
 
 const HOLD_DELAY = 400
@@ -40,7 +40,7 @@ export default function Stepper({
   // the repeat reads the ref, a closure over the prop would keep applying the same step
   const bump = (direction: 1 | -1) => {
     const current = latest.current
-    const next = Math.min(max, Math.max(min, current + direction * stepFor(current)))
+    const next = Math.min(max, Math.max(min, current + direction * stepFor(current, direction)))
     if (next === current) {
       stopHold()
       return
