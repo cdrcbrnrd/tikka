@@ -73,7 +73,7 @@ export default function History() {
           ))}
 
           <div className={`screen-footer ${styles.footer}`}>
-            <Button variant="ghost" onClick={() => setAskClear(true)}>
+            <Button variant="accent" block onClick={() => setAskClear(true)}>
               Vider l’historique
             </Button>
           </div>

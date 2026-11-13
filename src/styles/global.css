@@ -76,6 +76,18 @@ select {
   background: linear-gradient(to top, var(--bg) calc(100% - var(--space-7)), transparent);
 }
 
+/* the same veil at the top, so the list dissolves into the status bar instead of being cut */
+.screen::before {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: calc(var(--safe-top) + var(--space-5));
+  background: linear-gradient(to bottom, var(--bg) var(--safe-top), transparent);
+  pointer-events: none;
+}
+
 /* the bar leaves a strip of screen under it, and the list would scroll through it */
 .screen-footer::after {
   content: '';
