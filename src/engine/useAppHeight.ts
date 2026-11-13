@@ -7,6 +7,15 @@ export function useAppHeight(): void {
     let applied = 0
     let frame = 0
 
+    const insetTop = () => {
+      const probe = document.createElement('div')
+      probe.style.cssText = 'position:fixed;top:0;left:0;width:0;height:env(safe-area-inset-top)'
+      document.body.append(probe)
+      const height = probe.getBoundingClientRect().height
+      probe.remove()
+      return height
+    }
+
     const apply = () => {
       frame = 0
       // a keyboard shrinks the window on Android, the screen must not follow while typing
@@ -14,7 +23,12 @@ export function useAppHeight(): void {
       // iOS fires resize in bursts, and the property is inherited by the whole document
       if (window.innerHeight === applied) return
       applied = window.innerHeight
-      document.documentElement.style.setProperty('--app-height', `${applied}px`)
+      const root = document.documentElement.style
+      root.setProperty('--app-height', `${applied}px`)
+      // the browser reports the insets against the screen, but hands the installed app a view
+      // that stops short of it by exactly the status bar, and that band clears the indicator
+      const band = window.screen.height - applied
+      root.setProperty('--screen-gap', `${Math.abs(band - insetTop()) <= 1 ? band : 0}px`)
     }
 
     const schedule = () => {
