@@ -9,6 +9,16 @@ html {
   font-size: clamp(1rem, 0.9rem + 1.05vw, 1.2rem);
 }
 
+/* the pixel that keeps every screen scrollable must not cost a scrollbar */
+html {
+  scrollbar-width: none;
+}
+
+::-webkit-scrollbar {
+  width: 0;
+  height: 0;
+}
+
 html,
 body,
 #root {
@@ -64,7 +74,9 @@ select {
 .screen {
   display: flex;
   flex-direction: column;
-  min-height: var(--app-height, 100dvh);
+  /* the installed app keeps the foot of the screen to itself until the page scrolls, so
+     every screen asks for one pixel more than it has and the bar reaches the glass */
+  min-height: calc(var(--app-height, 100dvh) + 1px);
   padding: calc(var(--safe-top) + var(--space-5)) var(--space-4) var(--screen-bottom);
 }
 
