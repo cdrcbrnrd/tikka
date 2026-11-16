@@ -66,6 +66,8 @@ export const KIND_GROUPS: { label: string; kinds: TimerKind[] }[] = [
 // a card holds the name on one line beside its total, the field stops the athlete there
 export const NAME_MAX = 24
 
+export const DEFAULT_PREPARE = 15
+
 // a rest between series starts the moment it is launched, counting it down would be a second wait
 export function takesPrepare(kind: TimerKind): boolean {
   return kind !== 'rest'
@@ -76,7 +78,7 @@ export const SETTINGS = ['prepare', 'work', 'rest', 'rounds', 'period', 'duratio
 export type Setting = (typeof SETTINGS)[number]
 
 export function blankTimer(kind: TimerKind, id: string): Timer {
-  const common = { id, name: '', prepare: 15, warmup: 0, cooldown: 0 }
+  const common = { id, name: '', prepare: DEFAULT_PREPARE, warmup: 0, cooldown: 0 }
   const blocked = { blocks: 1, blockRest: 60, keepLastRest: false }
   switch (kind) {
     case 'intervals':

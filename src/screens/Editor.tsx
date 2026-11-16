@@ -2,10 +2,10 @@ import { useMemo, useState } from 'react'
 import { Navigate, useNavigate, useParams } from 'react-router-dom'
 import BackLink from '../components/BackLink.tsx'
 import Button from '../components/Button.tsx'
-import Select from '../components/Select.tsx'
 import { newId } from '../domain/id.ts'
 import {
   blankTimer,
+  DEFAULT_PREPARE,
   KIND_GROUPS,
   KIND_HINTS,
   KIND_LABELS,
@@ -19,11 +19,6 @@ import {
 import { useTimers } from '../store/timers.ts'
 import EditorFields from './EditorFields.tsx'
 import styles from './Editor.module.css'
-
-const GROUPS = KIND_GROUPS.map((group) => ({
-  label: group.label,
-  options: group.kinds.map((kind) => ({ value: kind, label: KIND_LABELS[kind], hint: KIND_HINTS[kind] })),
-}))
 
 export default function Editor() {
   const { id } = useParams()
@@ -40,12 +35,19 @@ export default function Editor() {
 function Form({ initial, isNew }: { initial: Timer; isNew: boolean }) {
   const [draft, setDraft] = useState<Timer>(initial)
   const [suggested, setSuggested] = useState<Set<Setting>>(() => new Set(isNew ? SETTINGS : []))
+  // a new chrono has no kind yet, so the settings have nothing to describe until one is picked
+  const [chosen, setChosen] = useState(!isNew)
+  // a kind without preparation would otherwise carry its zero over to every kind picked after it
+  const [keptPrepare, setKeptPrepare] = useState(
+    takesPrepare(initial.kind) ? initial.prepare : DEFAULT_PREPARE,
+  )
   const upsert = useTimers((state) => state.upsert)
   const navigate = useNavigate()
 
   const patch = (changes: Partial<Timer>) => setDraft((current) => ({ ...current, ...changes }) as Timer)
 
   const setSetting = (key: Setting, value: number) => {
+    if (key === 'prepare') setKeptPrepare(value)
     setSuggested((current) => {
       const next = new Set(current)
       next.delete(key)
@@ -62,7 +64,7 @@ function Form({ initial, isNew }: { initial: Timer; isNew: boolean }) {
         ...fresh,
         name: current.name,
         // a kind that hides the field keeps its own value, the athlete could never correct it
-        prepare: takesPrepare(kind) ? current.prepare : fresh.prepare,
+        prepare: takesPrepare(kind) ? keptPrepare : fresh.prepare,
         warmup: current.warmup,
         cooldown: current.cooldown,
       }
@@ -74,6 +76,11 @@ function Form({ initial, isNew }: { initial: Timer; isNew: boolean }) {
       if (!current.has('prepare')) next.delete('prepare')
       return next
     })
+  }
+
+  const pickKind = (kind: TimerKind) => {
+    setChosen(true)
+    changeKind(kind)
   }
 
   const name = draft.name.trim()
@@ -107,29 +114,40 @@ function Form({ initial, isNew }: { initial: Timer; isNew: boolean }) {
         </div>
 
         <div className={styles.group}>
-          <span className={styles.groupLabel} id="type-label">
-            Type
-          </span>
-          <Select
-            labelledBy="type-label"
-            title="Type de chrono"
-            value={draft.kind}
-            groups={GROUPS}
-            onChange={changeKind}
-          />
-          <span className={`subtle ${styles.hint}`}>{KIND_HINTS[draft.kind]}</span>
-        </div>
-
-        <div className={styles.group}>
-          <span className={styles.groupLabel}>Réglages</span>
-          <div className={styles.fields}>
-            <EditorFields draft={draft} suggested={suggested} setSetting={setSetting} />
+          <span className={styles.groupLabel}>Type</span>
+          <div className={styles.kinds}>
+            {KIND_GROUPS.map((family) => (
+              <div key={family.label} className={styles.family}>
+                <span className={styles.familyLabel}>{family.label}</span>
+                {family.kinds.map((kind) => (
+                  <button
+                    key={kind}
+                    type="button"
+                    className={`${styles.kind} ${chosen && draft.kind === kind ? styles.kindOn : ''}`}
+                    aria-pressed={chosen && draft.kind === kind}
+                    onClick={() => pickKind(kind)}
+                  >
+                    <span className={styles.kindName}>{KIND_LABELS[kind]}</span>
+                    <span className="subtle one-line">{KIND_HINTS[kind]}</span>
+                  </button>
+                ))}
+              </div>
+            ))}
           </div>
         </div>
+
+        {chosen && (
+          <div className={styles.group}>
+            <span className={styles.groupLabel}>Réglages</span>
+            <div className={styles.fields}>
+              <EditorFields draft={draft} suggested={suggested} setSetting={setSetting} />
+            </div>
+          </div>
+        )}
       </div>
 
       <div className={`screen-footer ${styles.actions}`}>
-        <Button variant="accent" block disabled={name === ''} onClick={save}>
+        <Button variant="accent" block disabled={!chosen || name === ''} onClick={save}>
           Enregistrer
         </Button>
       </div>
