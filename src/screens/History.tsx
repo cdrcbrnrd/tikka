@@ -35,11 +35,11 @@ export default function History() {
               <ul className={styles.list}>
                 {entries.map((session) => (
                   <li key={session.id} className={styles.entry}>
-                    <span className={styles.left}>
+                    <span className={styles.line}>
                       <span className={`${styles.name} one-line`}>{session.name}</span>
-                      <span className="subtle one-line">{detail(session)}</span>
+                      <span className={`${styles.duration} digits`}>{clock(session.elapsedMs / 1000)}</span>
                     </span>
-                    <span className={`${styles.duration} digits`}>{clock(session.elapsedMs / 1000)}</span>
+                    <span className="subtle one-line">{detail(session)}</span>
                   </li>
                 ))}
               </ul>
