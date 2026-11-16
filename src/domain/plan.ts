@@ -22,6 +22,10 @@ export type PlanBlock = {
   numbered: boolean
 }
 
+// tabata is a format, not a setting: these two are what makes it one
+const TABATA_WORK = 20
+const TABATA_REST = 10
+
 export type Plan = {
   prepare: number
   warmup: number
@@ -67,13 +71,23 @@ export function planOf(timer: Timer): Plan {
         ...common,
         blocks: stacked(timer, [{ label: 'Effort', work: timer.work, rest: timer.rest }], timer.rounds),
       }
+    case 'tabata':
+      return {
+        ...common,
+        blocks: stacked(timer, [{ label: 'Effort', work: TABATA_WORK, rest: TABATA_REST }], timer.rounds),
+      }
     case 'emom':
+    case 'exmom':
       return {
         ...common,
         blocks: stacked(timer, [{ label: 'Round', work: timer.period, rest: 0 }], timer.rounds, true),
       }
     case 'countdown':
       return { ...common, blocks: [once('En route', timer.duration)] }
+    case 'rest':
+      return { ...common, blocks: [once('Repos', timer.duration)] }
+    case 'fortime':
+      return { ...common, blocks: [once('Chrono', timer.cap)] }
     case 'stopwatch':
       return { ...common, blocks: [once('Chrono', null)] }
   }
