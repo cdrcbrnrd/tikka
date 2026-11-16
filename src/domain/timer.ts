@@ -1,6 +1,6 @@
 import { clockShort } from './format.ts'
 import { newId } from './id.ts'
-import { buildSegments } from './plan.ts'
+import { buildSegments, TABATA_REST, TABATA_WORK } from './plan.ts'
 
 export type TimerKind =
   | 'stopwatch'
@@ -50,7 +50,7 @@ export const KIND_HINTS: Record<TimerKind, string> = {
   countdown: 'Une durée qui descend',
   rest: 'Une récupération lancée à la main',
   intervals: 'Effort et repos qui alternent',
-  tabata: 'Le format fixe, 20 s d’effort et 10 s de repos',
+  tabata: `Le format fixe, ${clockShort(TABATA_WORK)} d’effort et ${clockShort(TABATA_REST)} de repos`,
   emom: 'Un top à chaque période',
   exmom: 'Un top toutes les X minutes',
   fortime: 'Jusqu’à ce que le travail soit fini',
@@ -65,6 +65,11 @@ export const KIND_GROUPS: { label: string; kinds: TimerKind[] }[] = [
 
 // a card holds the name on one line beside its total, the field stops the athlete there
 export const NAME_MAX = 24
+
+// a rest between series starts the moment it is launched, counting it down would be a second wait
+export function takesPrepare(kind: TimerKind): boolean {
+  return kind !== 'rest'
+}
 
 // the numeric fields an editor can set, typed so a key can never drift from the model
 export const SETTINGS = ['prepare', 'work', 'rest', 'rounds', 'period', 'duration'] as const
@@ -98,7 +103,7 @@ export function describe(timer: Timer): string {
     case 'intervals':
       return `${timer.rounds} séries · ${clockShort(timer.work)} / ${clockShort(timer.rest)}`
     case 'tabata':
-      return `${timer.rounds} cycles · 20 s / 10 s`
+      return `${timer.rounds} cycles · ${clockShort(TABATA_WORK)} / ${clockShort(TABATA_REST)}`
     case 'emom':
     case 'exmom':
       return `${timer.rounds} rounds · période de ${clockShort(timer.period)}`

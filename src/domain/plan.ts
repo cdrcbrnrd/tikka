@@ -11,7 +11,7 @@ export type Segment = {
   round: number
 }
 
-export type PlanStep = { label: string; work: number | null; rest: number }
+export type PlanStep = { label: string; work: number | null; rest: number; kind?: SegmentKind }
 
 export type PlanBlock = {
   label: string | null
@@ -23,8 +23,8 @@ export type PlanBlock = {
 }
 
 // tabata is a format, not a setting: these two are what makes it one
-const TABATA_WORK = 20
-const TABATA_REST = 10
+export const TABATA_WORK = 20
+export const TABATA_REST = 10
 
 export type Plan = {
   prepare: number
@@ -46,10 +46,10 @@ function stacked(series: Blocked, steps: PlanStep[], repeat: number, numbered = 
   }))
 }
 
-function once(label: string, work: number | null): PlanBlock {
+function once(label: string, work: number | null, kind: SegmentKind = 'work'): PlanBlock {
   return {
     label: null,
-    steps: [{ label, work, rest: 0 }],
+    steps: [{ label, work, rest: 0, kind }],
     repeat: 1,
     rest: 0,
     counts: work !== null,
@@ -85,7 +85,7 @@ export function planOf(timer: Timer): Plan {
     case 'countdown':
       return { ...common, blocks: [once('En route', timer.duration)] }
     case 'rest':
-      return { ...common, blocks: [once('Repos', timer.duration)] }
+      return { ...common, blocks: [once('Repos', timer.duration, 'rest')] }
     case 'fortime':
       return { ...common, blocks: [once('Chrono', timer.cap)] }
     case 'stopwatch':
@@ -115,7 +115,7 @@ export function expand(plan: Plan): Segment[] {
       for (const [position, step] of block.steps.entries()) {
         // the number the athlete reads has to be the one the screen counts, series after series
         const label = block.numbered ? `${step.label} ${round}` : step.label
-        segments.push({ kind: 'work', label, detail, duration: step.work, round })
+        segments.push({ kind: step.kind ?? 'work', label, detail, duration: step.work, round })
 
         // nothing may follow an open segment, which is what keeps it the last one
         if (step.work === null) {

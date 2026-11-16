@@ -1,6 +1,6 @@
 import Stepper from '../components/Stepper.tsx'
 import { clock } from '../domain/format.ts'
-import type { Setting, Timer } from '../domain/timer.ts'
+import { takesPrepare, type Setting, type Timer } from '../domain/timer.ts'
 
 const MIN_DURATION = 5
 
@@ -18,7 +18,7 @@ export default function EditorFields({ draft, suggested, setSetting }: Props) {
 
   return (
     <>
-      {draft.kind !== 'rest' && (
+      {takesPrepare(draft.kind) && (
         <Duration label="Préparation" value={draft.prepare} min={0} max={120} {...field('prepare')} />
       )}
 
@@ -72,8 +72,7 @@ function Duration({ label, value, min, max, onChange, suggested }: DurationProps
   )
 }
 
-// seconds are what matters on a short effort, minutes on a long one: 20 s and 0:45 stay reachable
-// without making a 20 min countdown a hundred presses away
+// a flat step would put a 20 min countdown a hundred presses away, or make 20 s unreachable
 function stepAt(seconds: number): number {
   if (seconds < 60) return 5
   if (seconds < 300) return 15

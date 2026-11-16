@@ -1,37 +1,86 @@
+import { useEffect, useState } from 'react'
 import Icon from './Icon.tsx'
 import styles from './Select.module.css'
 
-type Group<T extends string> = { label: string; options: { value: T; label: string }[] }
+type Option<T extends string> = { value: T; label: string; hint?: string }
+type Group<T extends string> = { label: string; options: Option<T>[] }
 
 type Props<T extends string> = {
-  id: string
+  labelledBy: string
+  title: string
   value: T
   groups: Group<T>[]
   onChange: (value: T) => void
 }
 
-export default function Select<T extends string>({ id, value, groups, onChange }: Props<T>) {
+export default function Select<T extends string>({ labelledBy, title, value, groups, onChange }: Props<T>) {
+  const [open, setOpen] = useState(false)
+  const current = groups.flatMap((group) => group.options).find((option) => option.value === value)
+
+  useEffect(() => {
+    if (!open) return
+    const onKey = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') setOpen(false)
+    }
+    document.addEventListener('keydown', onKey)
+    return () => document.removeEventListener('keydown', onKey)
+  }, [open])
+
+  const pick = (next: T) => {
+    setOpen(false)
+    onChange(next)
+  }
+
   return (
-    <div className={styles.wrap}>
-      <select
-        id={id}
+    <>
+      <button
+        type="button"
         className={styles.field}
-        value={value}
-        onChange={(event) => onChange(event.target.value as T)}
+        aria-labelledby={labelledBy}
+        aria-haspopup="dialog"
+        aria-expanded={open}
+        onClick={() => setOpen(true)}
       >
-        {groups.map((group) => (
-          <optgroup key={group.label} label={group.label}>
-            {group.options.map((option) => (
-              <option key={option.value} value={option.value}>
-                {option.label}
-              </option>
-            ))}
-          </optgroup>
-        ))}
-      </select>
-      <span className={styles.chevron}>
+        <span>{current?.label ?? ''}</span>
         <Icon name="chevron" size={20} />
-      </span>
-    </div>
+      </button>
+
+      {open && (
+        <div
+          className={styles.backdrop}
+          role="dialog"
+          aria-modal="true"
+          aria-label={title}
+          onClick={() => setOpen(false)}
+        >
+          {/* the sheet swallows the click so only the backdrop closes */}
+          <div className={styles.sheet} onClick={(event) => event.stopPropagation()}>
+            <strong className={styles.title}>{title}</strong>
+            <div className={styles.list}>
+              {groups.map((group) => (
+                <div key={group.label} className={styles.group}>
+                  <span className={styles.groupLabel}>{group.label}</span>
+                  {group.options.map((option) => (
+                    <button
+                      key={option.value}
+                      type="button"
+                      className={styles.option}
+                      aria-pressed={option.value === value}
+                      onClick={() => pick(option.value)}
+                    >
+                      <span className={styles.optionText}>
+                        <span className={styles.optionName}>{option.label}</span>
+                        {option.hint && <span className="subtle one-line">{option.hint}</span>}
+                      </span>
+                      {option.value === value && <Icon name="check" size={20} />}
+                    </button>
+                  ))}
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
+    </>
   )
 }

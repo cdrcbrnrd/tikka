@@ -11,6 +11,7 @@ import {
   KIND_LABELS,
   NAME_MAX,
   SETTINGS,
+  takesPrepare,
   type Setting,
   type Timer,
   type TimerKind,
@@ -21,7 +22,7 @@ import styles from './Editor.module.css'
 
 const GROUPS = KIND_GROUPS.map((group) => ({
   label: group.label,
-  options: group.kinds.map((kind) => ({ value: kind, label: KIND_LABELS[kind] })),
+  options: group.kinds.map((kind) => ({ value: kind, label: KIND_LABELS[kind], hint: KIND_HINTS[kind] })),
 }))
 
 export default function Editor() {
@@ -55,13 +56,17 @@ function Form({ initial, isNew }: { initial: Timer; isNew: boolean }) {
 
   const changeKind = (kind: TimerKind) => {
     if (kind === draft.kind) return
-    setDraft((current) => ({
-      ...blankTimer(kind, current.id),
-      name: current.name,
-      prepare: current.prepare,
-      warmup: current.warmup,
-      cooldown: current.cooldown,
-    }))
+    setDraft((current) => {
+      const fresh = blankTimer(kind, current.id)
+      return {
+        ...fresh,
+        name: current.name,
+        // a kind that hides the field keeps its own value, the athlete could never correct it
+        prepare: takesPrepare(kind) ? current.prepare : fresh.prepare,
+        warmup: current.warmup,
+        cooldown: current.cooldown,
+      }
+    })
     if (!isNew) return
     // the preparation is the one setting carried over, so it keeps whatever the athlete did to it
     setSuggested((current) => {
@@ -102,10 +107,16 @@ function Form({ initial, isNew }: { initial: Timer; isNew: boolean }) {
         </div>
 
         <div className={styles.group}>
-          <label className={styles.groupLabel} htmlFor="type">
+          <span className={styles.groupLabel} id="type-label">
             Type
-          </label>
-          <Select id="type" value={draft.kind} groups={GROUPS} onChange={changeKind} />
+          </span>
+          <Select
+            labelledBy="type-label"
+            title="Type de chrono"
+            value={draft.kind}
+            groups={GROUPS}
+            onChange={changeKind}
+          />
           <span className={`subtle ${styles.hint}`}>{KIND_HINTS[draft.kind]}</span>
         </div>
 
