@@ -95,24 +95,10 @@ function Form({ initial, isNew }: { initial: Timer; isNew: boolean }) {
       <header className={styles.group}>
         <BackLink to="/" label="Mes chronos" />
         <h1 className="title">{isNew ? 'Nouveau chrono' : draft.name}</h1>
+        {isNew && <span className="subtle">{chosen ? 'Puis donne-lui un nom.' : 'Commence par le type.'}</span>}
       </header>
 
       <div className={`${styles.form} grow`}>
-        <div className={styles.group}>
-          <label className={styles.groupLabel} htmlFor="nom">
-            Nom
-          </label>
-          <input
-            id="nom"
-            className={styles.name}
-            type="text"
-            value={draft.name}
-            maxLength={NAME_MAX}
-            placeholder="Nom du chrono"
-            onChange={(event) => patch({ name: event.target.value })}
-          />
-        </div>
-
         <div className={styles.group}>
           <span className={styles.groupLabel}>Type</span>
           <div className={styles.kinds}>
@@ -142,6 +128,23 @@ function Form({ initial, isNew }: { initial: Timer; isNew: boolean }) {
             <div className={styles.fields}>
               <EditorFields draft={draft} suggested={suggested} setSetting={setSetting} />
             </div>
+          </div>
+        )}
+
+        {chosen && (
+          <div className={styles.group}>
+            <label className={styles.groupLabel} htmlFor="nom">
+              Nom
+            </label>
+            <input
+              id="nom"
+              className={styles.name}
+              type="text"
+              value={draft.name}
+              maxLength={NAME_MAX}
+              placeholder="Nom du chrono"
+              onChange={(event) => patch({ name: event.target.value })}
+            />
           </div>
         )}
       </div>
