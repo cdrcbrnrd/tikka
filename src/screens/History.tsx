@@ -2,14 +2,13 @@ import { useState } from 'react'
 import BackLink from '../components/BackLink.tsx'
 import Button from '../components/Button.tsx'
 import Confirm from '../components/Confirm.tsx'
-import { clock, clockTenths, plural, sessionDate, sessionTime, splits } from '../domain/format.ts'
+import { clock, plural, sessionDate } from '../domain/format.ts'
 import { useHistory, type Session } from '../store/history.ts'
 import styles from './History.module.css'
 
 export default function History() {
   const sessions = useHistory((state) => state.sessions)
   const clear = useHistory((state) => state.clear)
-  const [open, setOpen] = useState<string | null>(null)
   const [askClear, setAskClear] = useState(false)
 
   const days = groupByDay(sessions)
@@ -34,40 +33,15 @@ export default function History() {
             <section key={label} className={styles.day}>
               <h2 className={styles.dayLabel}>{label}</h2>
               <ul className={styles.list}>
-                {entries.map((session) => {
-                  const hasLaps = session.laps.length > 0
-                  return (
+                {entries.map((session) => (
                   <li key={session.id} className={styles.entry}>
-                    <button
-                      type="button"
-                      className={`${styles.summary} ${hasLaps ? '' : styles.flat}`}
-                      aria-expanded={hasLaps ? open === session.id : undefined}
-                      disabled={!hasLaps}
-                      onClick={() => setOpen((current) => (current === session.id ? null : session.id))}
-                    >
-                      <span className={styles.left}>
-                        <span className={`${styles.name} one-line`}>{session.name}</span>
-                        <span className="subtle one-line">{detail(session)}</span>
-                      </span>
-                      <span className={styles.right}>
-                        <span className={`${styles.duration} digits`}>{clock(session.elapsedMs / 1000)}</span>
-                        <span className={`subtle digits ${styles.hour}`}>{sessionTime(session.startedAt)}</span>
-                      </span>
-                    </button>
-
-                    {hasLaps && open === session.id && (
-                      <ol className={styles.laps}>
-                        {splits(session.laps).map((split, index) => (
-                          <li key={index} className={styles.lap}>
-                            <span className="muted">Tour {index + 1}</span>
-                            <span className="digits">{clockTenths(split)}</span>
-                          </li>
-                        ))}
-                      </ol>
-                    )}
+                    <span className={styles.left}>
+                      <span className={`${styles.name} one-line`}>{session.name}</span>
+                      <span className="subtle one-line">{detail(session)}</span>
+                    </span>
+                    <span className={`${styles.duration} digits`}>{clock(session.elapsedMs / 1000)}</span>
                   </li>
-                  )
-                })}
+                ))}
               </ul>
             </section>
           ))}

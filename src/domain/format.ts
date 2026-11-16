@@ -22,10 +22,6 @@ export function sessionDate(iso: string): string {
   })
 }
 
-export function sessionTime(iso: string): string {
-  return new Date(iso).toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })
-}
-
 export function clockShort(seconds: number): string {
   if (seconds < 60) return `${seconds} s`
   const minutes = Math.floor(seconds / 60)
