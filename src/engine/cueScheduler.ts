@@ -1,4 +1,4 @@
-import type { SegmentKind } from '../domain/timer.ts'
+import type { SegmentKind } from '../domain/plan.ts'
 import { playCue } from './cues.ts'
 
 export type CueScheduler = {

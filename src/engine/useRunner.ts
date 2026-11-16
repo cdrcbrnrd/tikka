@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import { buildSegments, totalRounds, type Segment, type Timer } from '../domain/timer.ts'
+import { buildSegments, totalRounds, type Segment } from '../domain/plan.ts'
+import type { Timer } from '../domain/timer.ts'
 import { createCueScheduler } from './cueScheduler.ts'
 import { unlockAudio, playCue } from './cues.ts'
 

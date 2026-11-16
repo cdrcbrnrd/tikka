@@ -1,5 +1,6 @@
 import { clockShort } from './format.ts'
 import { newId } from './id.ts'
+import { buildSegments } from './plan.ts'
 
 export type TimerKind = 'intervals' | 'emom' | 'countdown' | 'stopwatch'
 
@@ -7,12 +8,16 @@ type Common = {
   id: string
   name: string
   prepare: number
+  warmup: number
+  cooldown: number
 }
+
+export type Blocked = { blocks: number; blockRest: number; keepLastRest: boolean }
 
 export type Timer = Common &
   (
-    | { kind: 'intervals'; work: number; rest: number; rounds: number }
-    | { kind: 'emom'; period: number; rounds: number }
+    | ({ kind: 'intervals'; work: number; rest: number; rounds: number } & Blocked)
+    | ({ kind: 'emom'; period: number; rounds: number } & Blocked)
     | { kind: 'countdown'; duration: number }
     | { kind: 'stopwatch' }
   )
@@ -35,12 +40,13 @@ export const KIND_HINTS: Record<TimerKind, string> = {
 export const NAME_MAX = 24
 
 export function blankTimer(kind: TimerKind, id: string): Timer {
-  const common = { id, name: '', prepare: 15 }
+  const common = { id, name: '', prepare: 15, warmup: 0, cooldown: 0 }
+  const blocked = { blocks: 1, blockRest: 60, keepLastRest: false }
   switch (kind) {
     case 'intervals':
-      return { ...common, kind, work: 60, rest: 30, rounds: 8 }
+      return { ...common, ...blocked, kind, work: 60, rest: 30, rounds: 8 }
     case 'emom':
-      return { ...common, kind, period: 60, rounds: 12 }
+      return { ...common, ...blocked, kind, period: 60, rounds: 12 }
     case 'countdown':
       return { ...common, kind, duration: 1200 }
     case 'stopwatch':
@@ -74,50 +80,4 @@ export function totalShort(timer: Timer): Total | null {
 
 export function copyOf(timer: Timer): Timer {
   return { ...timer, id: newId(), name: `${timer.name} (copie)` }
-}
-
-export type SegmentKind = 'prepare' | 'work' | 'rest'
-
-// a null duration runs until the athlete stops it, and only the last segment may be open
-export type Segment = {
-  kind: SegmentKind
-  label: string
-  duration: number | null
-  round: number
-}
-
-export function buildSegments(timer: Timer): Segment[] {
-  const segments: Segment[] = []
-  if (timer.prepare > 0) {
-    segments.push({ kind: 'prepare', label: 'Préparation', duration: timer.prepare, round: 0 })
-  }
-
-  switch (timer.kind) {
-    case 'intervals':
-      for (let round = 1; round <= timer.rounds; round += 1) {
-        segments.push({ kind: 'work', label: 'Effort', duration: timer.work, round })
-        // the rest after the last round is dead time, the session is over
-        if (timer.rest > 0 && round < timer.rounds) {
-          segments.push({ kind: 'rest', label: 'Repos', duration: timer.rest, round })
-        }
-      }
-      break
-    case 'emom':
-      for (let round = 1; round <= timer.rounds; round += 1) {
-        segments.push({ kind: 'work', label: `Round ${round}`, duration: timer.period, round })
-      }
-      break
-    case 'countdown':
-      segments.push({ kind: 'work', label: 'En route', duration: timer.duration, round: 1 })
-      break
-    case 'stopwatch':
-      segments.push({ kind: 'work', label: 'Chrono', duration: null, round: 0 })
-      break
-  }
-
-  return segments
-}
-
-export function totalRounds(segments: Segment[]): number {
-  return segments.reduce((max, segment) => Math.max(max, segment.round), 0)
 }

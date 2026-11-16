@@ -44,12 +44,27 @@ Quatre couches, et la dépendance ne va que vers le bas :
 
 ### Tout part des segments
 
-`buildSegments(timer)` dans `src/domain/timer.ts` déplie un chrono en une liste plate de
+`buildSegments(timer)` dans `src/domain/plan.ts` déplie un chrono en une liste plate de
 `Segment` (`prepare`, `work`, `rest`, avec son label et son round). **C'est la seule source de
 vérité sur le déroulé d'une séance** : le moteur, le compteur de rounds, le total affiché sur
-la carte et les tops sonores en sortent tous. Un changement de règle (le repos après la
-dernière série ne compte pas, la préparation compte) se fait là, jamais en recopiant une
-formule ailleurs.
+la carte et les tops sonores en sortent tous.
+
+Il passe par deux étages, et c'est ce qui empêche une règle d'être recopiée :
+
+- `planOf(timer)` traduit les réglages saisis en un `Plan` — des blocs, des étapes, des
+  drapeaux. Un bras par type de chrono, purement déclaratif : il rend une donnée et ne sait
+  pas fabriquer un `Segment`.
+- `expand(plan)` est **la seule boucle de l'application**. Les règles transverses y vivent et
+  nulle part ailleurs : boucler les rounds, supprimer le dernier repos, insérer un repos
+  entre deux séries, ne rien mettre après un segment ouvert, garder l'échauffement et le
+  retour au calme hors des rounds.
+
+Ajouter un type de chrono, c'est donc ajouter un bras de `planOf` et un formulaire. Changer
+une règle de déroulé, c'est toucher `expand`.
+
+`src/domain/timer.ts` garde le modèle saisi — ce que l'athlète a réglé — et importe
+`buildSegments` pour le total de la carte. `plan.ts` n'importe de lui que le *type* `Timer`,
+donc il n'y a pas de cycle à l'exécution.
 
 Une `duration` à `null` veut dire « jusqu'à ce que l'athlète arrête » — seul le dernier
 segment peut être ouvert, c'est ce qui distingue le chrono montant du reste.

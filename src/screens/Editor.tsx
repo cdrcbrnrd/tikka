@@ -53,7 +53,13 @@ function Form({ initial, isNew }: { initial: Timer; isNew: boolean }) {
   const changeKind = (kind: TimerKind) => {
     // the kind buttons stay pressable once active, and rebuilding would throw away what was set
     if (kind === draft.kind) return
-    setDraft((current) => ({ ...blankTimer(kind, current.id), name: current.name, prepare: current.prepare }))
+    setDraft((current) => ({
+      ...blankTimer(kind, current.id),
+      name: current.name,
+      prepare: current.prepare,
+      warmup: current.warmup,
+      cooldown: current.cooldown,
+    }))
     if (!isNew) return
     // the preparation is the one setting carried over, so it keeps whatever the athlete did to it
     setSuggested((current) => {

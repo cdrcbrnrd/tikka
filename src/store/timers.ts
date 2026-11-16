@@ -22,7 +22,8 @@ export const useTimers = create<TimersState>()(
         }),
       remove: (id) => set((state) => ({ timers: state.timers.filter((item) => item.id !== id) })),
     }),
-    { name: 'tikka.timers', version: 1 },
+    // the stored shape gained its series fields in one go, and old chronos are not worth carrying over
+    { name: 'tikka.timers', version: 2, migrate: () => ({ timers: [] }) },
   ),
 )
 
