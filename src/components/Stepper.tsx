@@ -9,6 +9,7 @@ type Props = {
   onChange: (value: number) => void
   format?: (value: number) => string
   stepFor?: (value: number, direction: 1 | -1) => number
+  suggested?: boolean
 }
 
 const HOLD_DELAY = 400
@@ -22,6 +23,7 @@ export default function Stepper({
   onChange,
   format = String,
   stepFor = () => 1,
+  suggested = false,
 }: Props) {
   const latest = useRef(value)
   const release = useRef<(() => void) | null>(null)
@@ -84,7 +86,9 @@ export default function Stepper({
         >
           −
         </button>
-        <span className={`${styles.value} digits`}>{format(value)}</span>
+        <span className={`${styles.value} digits ${suggested ? 'muted' : ''}`}>
+          {format(value)}
+        </span>
         <button
           type="button"
           className={styles.step}

@@ -38,7 +38,7 @@ export default function Home() {
       {timers.length === 0 ? (
         <div className="empty grow">
           <p>Aucun chrono pour l’instant.</p>
-          <p className="subtle">Crée ton premier réglage, il restera sur le téléphone.</p>
+          <p className="subtle">Crée ton premier réglage.</p>
         </div>
       ) : (
         <ul className={`${styles.list} grow`}>

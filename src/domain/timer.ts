@@ -31,12 +31,11 @@ export const KIND_HINTS: Record<TimerKind, string> = {
   stopwatch: 'Compte à l’endroit, tours à la main',
 }
 
-// a card holds the name on one line beside its total: the field stops the athlete there,
-// a generated name stays whole rather than lying about a duration it cut in half
+// a card holds the name on one line beside its total, the field stops the athlete there
 export const NAME_MAX = 24
 
 export function blankTimer(kind: TimerKind, id: string): Timer {
-  const common = { id, name: '', prepare: 10 }
+  const common = { id, name: '', prepare: 15 }
   switch (kind) {
     case 'intervals':
       return { ...common, kind, work: 60, rest: 30, rounds: 8 }
@@ -46,19 +45,6 @@ export function blankTimer(kind: TimerKind, id: string): Timer {
       return { ...common, kind, duration: 1200 }
     case 'stopwatch':
       return { ...common, kind }
-  }
-}
-
-export function defaultName(timer: Timer): string {
-  switch (timer.kind) {
-    case 'intervals':
-      return `${timer.rounds} × ${clockShort(timer.work)} / ${clockShort(timer.rest)}`
-    case 'emom':
-      return `EMOM ${timer.rounds}`
-    case 'countdown':
-      return `AMRAP ${Math.round(timer.duration / 60)}`
-    case 'stopwatch':
-      return 'Chrono libre'
   }
 }
 
@@ -84,11 +70,6 @@ export function totalShort(timer: Timer): Total | null {
   const seconds = segments.reduce((total, segment) => total + (segment.duration ?? 0), 0)
   if (seconds < 60) return { value: String(seconds), unit: 's' }
   return { value: String(Math.round(seconds / 60)), unit: 'min' }
-}
-
-export function named(timer: Timer): Timer {
-  const typed = timer.name.trim()
-  return { ...timer, name: typed === '' ? defaultName(timer) : typed }
 }
 
 export function copyOf(timer: Timer): Timer {
