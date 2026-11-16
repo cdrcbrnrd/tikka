@@ -17,5 +17,6 @@ type Props = { name: IconName; size?: number }
 
 export default function Icon({ name, size = 20 }: Props) {
   const Glyph = ICONS[name]
-  return <Glyph size={size} aria-hidden="true" />
+  // lucide thickens the stroke along with the size, absolute keeps one line weight across the app
+  return <Glyph size={size} absoluteStrokeWidth aria-hidden="true" />
 }
