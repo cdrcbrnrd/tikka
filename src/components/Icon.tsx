@@ -1,10 +1,11 @@
-import { ChevronLeft, Clock, Copy, Pencil, Plus, Settings2, Trash2 } from 'lucide-react'
+import { ChevronDown, ChevronLeft, Clock, Copy, Pencil, Plus, Settings2, Trash2 } from 'lucide-react'
 
 // lucide, the set shadcn draws with, kept behind one name so a screen never imports a glyph directly
 const ICONS = {
   pencil: Pencil,
   plus: Plus,
   back: ChevronLeft,
+  chevron: ChevronDown,
   clock: Clock,
   settings: Settings2,
   copy: Copy,
