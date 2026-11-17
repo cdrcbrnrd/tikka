@@ -57,9 +57,7 @@ function Form({ initial, isNew }: { initial: Timer; isNew: boolean }) {
       </header>
 
       <div className={`${styles.form} grow`}>
-        <div className={styles.group}>
-          <EditorFields draft={draft} patch={patch} />
-        </div>
+        <EditorFields draft={draft} patch={patch} />
 
         <div className={styles.group}>
           <label className="group-label" htmlFor="nom">
