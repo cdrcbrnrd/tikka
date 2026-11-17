@@ -1,0 +1,46 @@
+.families {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+}
+
+.family {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-3) var(--space-4);
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  min-height: var(--tap);
+  transition: background var(--transition);
+}
+
+.row:active {
+  background: var(--surface-active);
+}
+
+.rowIcon {
+  display: inline-flex;
+  flex: none;
+  color: var(--muted);
+}
+
+.rowText {
+  display: flex;
+  flex: 1;
+  /* a flex child refuses to shrink under its content, which pushes the chevron off the screen */
+  min-width: 0;
+  flex-direction: column;
+  gap: 0.125rem;
+}
+
+.rowName {
+  font-weight: 600;
+}

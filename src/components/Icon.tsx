@@ -1,14 +1,40 @@
-import { ChevronLeft, Clock, Copy, Pencil, Plus, Settings2, Trash2 } from 'lucide-react'
+import {
+  AlarmClock,
+  ChevronLeft,
+  ChevronRight,
+  Clock,
+  Coffee,
+  Copy,
+  FlagTriangleRight,
+  Hourglass,
+  Pencil,
+  Plus,
+  Repeat,
+  Settings2,
+  Timer,
+  TimerReset,
+  Trash2,
+  Zap,
+} from 'lucide-react'
 
 // lucide, the set shadcn draws with, kept behind one name so a screen never imports a glyph directly
 const ICONS = {
   pencil: Pencil,
   plus: Plus,
   back: ChevronLeft,
+  go: ChevronRight,
   clock: Clock,
   settings: Settings2,
   copy: Copy,
   trash: Trash2,
+  timer: Timer,
+  hourglass: Hourglass,
+  coffee: Coffee,
+  repeat: Repeat,
+  bolt: Zap,
+  alarm: AlarmClock,
+  reset: TimerReset,
+  flag: FlagTriangleRight,
 }
 
 export type IconName = keyof typeof ICONS

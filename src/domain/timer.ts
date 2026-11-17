@@ -2,15 +2,18 @@ import { clockShort, NBSP } from './format.ts'
 import { newId } from './id.ts'
 import { buildSegments, TABATA_REST, TABATA_WORK } from './plan.ts'
 
-export type TimerKind =
-  | 'stopwatch'
-  | 'countdown'
-  | 'rest'
-  | 'intervals'
-  | 'tabata'
-  | 'emom'
-  | 'exmom'
-  | 'fortime'
+export const KINDS = [
+  'stopwatch',
+  'countdown',
+  'rest',
+  'intervals',
+  'tabata',
+  'emom',
+  'exmom',
+  'fortime',
+] as const
+
+export type TimerKind = (typeof KINDS)[number]
 
 type Common = {
   id: string
@@ -56,6 +59,10 @@ export const KIND_HINTS: Record<TimerKind, string> = {
   fortime: 'Jusqu’à ce que le travail soit fini',
 }
 
+export function isKind(value: string | undefined): value is TimerKind {
+  return KINDS.some((kind) => kind === value)
+}
+
 export const KIND_GROUPS: { label: string; kinds: TimerKind[] }[] = [
   { label: 'Chrono', kinds: ['stopwatch', 'countdown', 'rest'] },
   { label: 'Intervalles', kinds: ['intervals', 'tabata'] },
@@ -66,7 +73,7 @@ export const KIND_GROUPS: { label: string; kinds: TimerKind[] }[] = [
 // a card holds the name on one line beside its total, the field stops the athlete there
 export const NAME_MAX = 24
 
-export const DEFAULT_PREPARE = 15
+const DEFAULT_PREPARE = 15
 
 // a rest between series starts the moment it is launched, counting it down would be a second wait
 export function takesPrepare(kind: TimerKind): boolean {
