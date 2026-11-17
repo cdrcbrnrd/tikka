@@ -97,7 +97,7 @@ Il n'existe aucun bandeau « nouvelle version », c'est assumé.
 
 ## Conventions
 
-- **Styles** : un `*.module.css` par écran et par composant, plus des classes utilitaires globales dans `global.css` (`.screen`, `.screen-footer`, `.screen-head`, `.screen-intro`, `.title`, `.subtle`, `.muted`,
+- **Styles** : un `*.module.css` par écran et par composant, plus des classes utilitaires globales dans `global.css` (`.screen`, `.screen-footer`, `.screen-head`, `.screen-intro`, `.title`, `.subtle`,
   `.group-label`, `.line`, `.digits`, `.grow`, `.empty`, `.one-line`). Toujours passer par les tokens de `tokens.css`, jamais une valeur en dur. Le détail des jetons — rôle de chacun, valeurs des trois ambiances, qui consomme quoi — est dans `docs/design-tokens.md` : à lire avant de toucher à `tokens.css` ou d'ajouter une ambiance.
 - **Hauteurs d'écran** : `var(--app-height, 100dvh)`, jamais `100%` ni `vh`, et `env(safe-area-inset-*)` pour les bords. `--app-height` est mesuré en JS par `useAppHeight` parce que l'app installée reçoit une hauteur périmée au premier affichage ; `dvh` reste le repli. Un élément collé en bas se cale sur `--screen-bottom`.
 - **Thèmes** : trois ambiances (`foret`, `nuit`, `braise`) déclarées dans `src/domain/theme.ts` et `tokens.css`, posées en `data-theme` sur `<html>`. En ajouter une veut dire toucher les deux fichiers, et `useTheme` met aussi à jour le `meta[name=theme-color]`, que la barre d'état de l'app installée est seule à lire.

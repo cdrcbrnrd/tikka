@@ -10,7 +10,6 @@ type Props = {
   format?: (value: number) => string
   stepFor?: (value: number, direction: 1 | -1) => number
   parse?: (text: string) => number | null
-  suggested?: boolean
 }
 
 const HOLD_DELAY = 400
@@ -25,7 +24,6 @@ export default function Stepper({
   format = String,
   stepFor = () => 1,
   parse,
-  suggested = false,
 }: Props) {
   const [typed, setTyped] = useState<string | null>(null)
   const latest = useRef(value)
@@ -98,11 +96,11 @@ export default function Stepper({
           −
         </button>
         {typed === null && parse === undefined ? (
-          <span className={`${styles.value} digits ${suggested ? 'muted' : ''}`}>{format(value)}</span>
+          <span className={`${styles.value} digits`}>{format(value)}</span>
         ) : typed === null ? (
           <button
             type="button"
-            className={`${styles.value} digits ${suggested ? 'muted' : ''}`}
+            className={`${styles.value} digits`}
             aria-label={`Saisir ${label}`}
             onClick={() => setTyped(format(value))}
           >

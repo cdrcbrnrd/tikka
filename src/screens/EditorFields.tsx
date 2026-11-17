@@ -6,13 +6,11 @@ const MIN_DURATION = 5
 
 type Props = {
   draft: Timer
-  suggested: Set<Setting>
   setSetting: (key: Setting, value: number) => void
 }
 
-export default function EditorFields({ draft, suggested, setSetting }: Props) {
+export default function EditorFields({ draft, setSetting }: Props) {
   const field = (key: Setting) => ({ onChange: (value: number) => setSetting(key, value) })
-  const rounds = { suggested: suggested.has('rounds'), ...field('rounds') }
 
   return (
     <>
@@ -24,18 +22,18 @@ export default function EditorFields({ draft, suggested, setSetting }: Props) {
         <>
           <Duration label="Effort" value={draft.work} min={MIN_DURATION} max={3600} {...field('work')} />
           <Duration label="Repos" value={draft.rest} min={0} max={3600} {...field('rest')} />
-          <Stepper label="Séries" value={draft.rounds} min={1} max={60} {...rounds} />
+          <Stepper label="Séries" value={draft.rounds} min={1} max={60} {...field('rounds')} />
         </>
       )}
 
       {draft.kind === 'tabata' && (
-        <Stepper label="Cycles" value={draft.rounds} min={1} max={60} {...rounds} />
+        <Stepper label="Cycles" value={draft.rounds} min={1} max={60} {...field('rounds')} />
       )}
 
       {(draft.kind === 'emom' || draft.kind === 'exmom') && (
         <>
           <Duration label="Période" value={draft.period} min={MIN_DURATION} max={600} {...field('period')} />
-          <Stepper label="Rounds" value={draft.rounds} min={1} max={60} {...rounds} />
+          <Stepper label="Rounds" value={draft.rounds} min={1} max={60} {...field('rounds')} />
         </>
       )}
 

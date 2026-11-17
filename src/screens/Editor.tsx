@@ -11,7 +11,6 @@ import {
   KIND_HINTS,
   KIND_LABELS,
   NAME_MAX,
-  SETTINGS,
   type Setting,
   type Timer,
 } from '../domain/timer.ts'
@@ -35,16 +34,10 @@ export default function Editor() {
 
 function Form({ initial, isNew }: { initial: Timer; isNew: boolean }) {
   const [draft, setDraft] = useState<Timer>(initial)
-  const [suggested, setSuggested] = useState<Set<Setting>>(() => new Set(isNew ? SETTINGS : []))
   const upsert = useTimers((state) => state.upsert)
   const navigate = useNavigate()
 
   const setSetting = (key: Setting, value: number) => {
-    setSuggested((current) => {
-      const next = new Set(current)
-      next.delete(key)
-      return next
-    })
     setDraft((current) => ({ ...current, [key]: value }) as Timer)
   }
 
@@ -68,7 +61,7 @@ function Form({ initial, isNew }: { initial: Timer; isNew: boolean }) {
 
       <div className={`${styles.form} grow`}>
         <div className={styles.group}>
-          <EditorFields draft={draft} suggested={suggested} setSetting={setSetting} />
+          <EditorFields draft={draft} setSetting={setSetting} />
         </div>
 
         <div className={styles.group}>

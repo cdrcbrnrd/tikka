@@ -141,10 +141,6 @@ select {
   padding-left: var(--space-1);
 }
 
-.muted {
-  color: var(--muted);
-}
-
 .grow {
   flex: 1;
 }
