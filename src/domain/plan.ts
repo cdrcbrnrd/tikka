@@ -37,7 +37,7 @@ export type Plan = {
 function stacked(series: Blocked, steps: PlanStep[], repeat: number, numbered = false): PlanBlock[] {
   const count = Math.max(1, series.blocks)
   return Array.from({ length: count }, (_, index) => ({
-    label: count > 1 ? `Série ${index + 1} / ${count}` : null,
+    label: count > 1 ? `Bloc ${index + 1} / ${count}` : null,
     steps,
     repeat,
     rest: series.blockRest,
@@ -130,9 +130,9 @@ export function expand(plan: Plan): Segment[] {
       }
     }
 
-    // a series rest only bridges two series, so the last one is dead time whatever the option says
+    // a block rest only bridges two blocks, so the last one is dead time whatever the option says
     if (!open && index < plan.blocks.length - 1 && block.rest > 0) {
-      segments.push({ kind: 'rest', label: 'Repos de série', detail, duration: block.rest, round })
+      segments.push({ kind: 'rest', label: 'Repos de bloc', detail, duration: block.rest, round })
     }
   }
 

@@ -85,7 +85,7 @@ function Session({ timer }: { timer: Timer }) {
           <span className={`${styles.name} one-line`}>{timer.name}</span>
         )}
         {runner.rounds > 1 && runner.status !== 'done' && (
-          <span className={`subtle digits ${styles.rounds}`}>
+          <span className="subtle digits">
             Round {Math.max(1, runner.round)} / {runner.rounds}
           </span>
         )}
@@ -109,6 +109,7 @@ function Session({ timer }: { timer: Timer }) {
       ) : (
         <div className={styles.stage}>
           <ProgressRing progress={runner.segmentProgress} tone={tone}>
+            {runner.segment?.detail && <span className="subtle">{runner.segment.detail}</span>}
             <span className={styles.phase}>{phase}</span>
             <span className={`${styles.time} digits ${urgent ? styles.urgent : ''}`}>{time}</span>
             {!runner.openEnded && (

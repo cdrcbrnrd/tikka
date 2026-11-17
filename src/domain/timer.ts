@@ -90,6 +90,8 @@ export const SETTINGS = [
   'rounds',
   'period',
   'duration',
+  'blocks',
+  'blockRest',
 ] as const
 export type Setting = (typeof SETTINGS)[number]
 
@@ -117,14 +119,15 @@ export function blankTimer(kind: TimerKind, id: string): Timer {
 }
 
 export function describe(timer: Timer): string {
+  const stack = 'blocks' in timer && timer.blocks > 1 ? `${timer.blocks} blocs de ` : ''
   switch (timer.kind) {
     case 'intervals':
-      return `${timer.rounds} séries · ${clockShort(timer.work)} / ${clockShort(timer.rest)}`
+      return `${stack}${timer.rounds} séries · ${clockShort(timer.work)} / ${clockShort(timer.rest)}`
     case 'tabata':
-      return `${timer.rounds} cycles · ${clockShort(TABATA_WORK)} / ${clockShort(TABATA_REST)}`
+      return `${stack}${timer.rounds} cycles · ${clockShort(TABATA_WORK)} / ${clockShort(TABATA_REST)}`
     case 'emom':
     case 'exmom':
-      return `${timer.rounds} rounds · période de ${clockShort(timer.period)}`
+      return `${stack}${timer.rounds} rounds · période de ${clockShort(timer.period)}`
     case 'countdown':
       return `${clockShort(timer.duration)} en comptant à rebours`
     case 'rest':

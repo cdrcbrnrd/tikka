@@ -44,6 +44,21 @@ export default function EditorFields({ draft, setSetting }: Props) {
         <Duration label="Durée" value={draft.duration} min={MIN_DURATION} max={7200} {...field('duration')} />
       )}
 
+      {'blocks' in draft && (
+        <>
+          <Stepper label="Blocs" value={draft.blocks} min={1} max={10} {...field('blocks')} />
+          {draft.blocks > 1 && (
+            <Duration
+              label="Repos de bloc"
+              value={draft.blockRest}
+              min={0}
+              max={600}
+              {...field('blockRest')}
+            />
+          )}
+        </>
+      )}
+
       {/* nothing can follow a segment the athlete closes by hand, the field would set a dead value */}
       {!isOpenEnded(draft) && (
         <Duration
