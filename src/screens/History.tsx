@@ -31,11 +31,11 @@ export default function History() {
         <div className={`grow ${styles.body}`}>
           {days.map(([label, entries]) => (
             <section key={label} className={styles.day}>
-              <h2 className={styles.dayLabel}>{label}</h2>
+              <h2 className="group-label">{label}</h2>
               <ul className={styles.list}>
                 {entries.map((session) => (
                   <li key={session.id} className={styles.entry}>
-                    <span className={styles.line}>
+                    <span className="line">
                       <span className={`${styles.name} one-line`}>{session.name}</span>
                       <span className={`${styles.duration} digits`}>{clock(session.elapsedMs / 1000)}</span>
                     </span>

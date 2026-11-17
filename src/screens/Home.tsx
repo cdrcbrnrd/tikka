@@ -4,7 +4,8 @@ import Button from '../components/Button.tsx'
 import ConfirmDeleteTimer from '../components/ConfirmDeleteTimer.tsx'
 import Icon from '../components/Icon.tsx'
 import SwipeRow from '../components/SwipeRow.tsx'
-import { copyOf, describe, totalShort, type Timer } from '../domain/timer.ts'
+import Total from '../components/Total.tsx'
+import { copyOf, describe, type Timer } from '../domain/timer.ts'
 import { useTimers } from '../store/timers.ts'
 import styles from './Home.module.css'
 
@@ -67,7 +68,7 @@ export default function Home() {
                 ]}
               >
                 <Link to={`/lancer/${timer.id}`} className={styles.main} draggable={false}>
-                  <span className={styles.line}>
+                  <span className="line">
                     <span className={`${styles.name} one-line`}>{timer.name}</span>
                     <Total timer={timer} />
                   </span>
@@ -95,10 +96,4 @@ export default function Home() {
       )}
     </div>
   )
-}
-
-function Total({ timer }: { timer: Timer }) {
-  const total = totalShort(timer)
-  if (!total) return null
-  return <span className={`${styles.total} digits`}>{total}</span>
 }

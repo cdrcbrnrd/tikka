@@ -1,0 +1,5 @@
+.total {
+  flex: none;
+  font-size: var(--text-sm);
+  color: var(--muted);
+}

@@ -99,6 +99,20 @@ select {
   background: var(--bg);
 }
 
+.screen-intro {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  margin-bottom: var(--space-5);
+}
+
+.line {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--space-3);
+}
+
 .screen-head {
   display: flex;
   align-items: baseline;
@@ -116,6 +130,15 @@ select {
 .subtle {
   color: var(--muted);
   font-size: var(--text-sm);
+}
+
+.group-label {
+  font-size: var(--text-xs);
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--muted);
+  padding-left: var(--space-1);
 }
 
 .muted {

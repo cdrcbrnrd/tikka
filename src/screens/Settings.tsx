@@ -17,7 +17,7 @@ export default function Settings() {
       </header>
 
       <div className={`${styles.group} grow`}>
-        <h2 className={styles.label}>Ambiance</h2>
+        <h2 className="group-label">Ambiance</h2>
         {THEMES.map((item) => (
           <button
             key={item.id}
