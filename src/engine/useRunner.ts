@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import { buildSegments, totalRounds, type Segment } from '../domain/plan.ts'
+import { buildSegments, clockedIndex, totalRounds, type Segment } from '../domain/plan.ts'
 import type { Timer } from '../domain/timer.ts'
 import { createCueScheduler } from './cueScheduler.ts'
 import { unlockAudio, playCue } from './cues.ts'
@@ -77,6 +77,8 @@ export function useRunner(timer: Timer): Runner {
   const lap = useCallback(() => {
     if (startedAt.current === null) return
     const elapsed = Date.now() - startedAt.current
+    // the phone is on the floor, a sound is the only confirmation the athlete gets
+    playCue('tick')
     setLaps((current) => [...current, elapsed - segmentStart(elapsed, bounds)])
   }, [bounds])
 
@@ -113,13 +115,15 @@ export function useRunner(timer: Timer): Runner {
   const end = index === -1 ? 0 : (bounds[index] ?? 0)
   const durationMs = segment?.duration == null ? null : segment.duration * 1000
   const segmentElapsedMs = index === -1 ? elapsedMs : elapsedMs - segmentStart(elapsedMs, bounds)
-  // the warm-up of an open-ended timer is not part of what the athlete clocked
-  const openStart = openEnded && segments.length > 1 ? (bounds[segments.length - 2] ?? 0) : 0
+  // the session an athlete reads is the clocked stretch alone, not the warm-up around it
+  const clocked = clockedIndex(segments)
+  const clockedFrom = clocked <= 0 ? 0 : (bounds[clocked - 1] ?? 0)
+  const clockedTo = clocked === -1 ? totalMs : (bounds[clocked] ?? Number.POSITIVE_INFINITY)
 
   return {
     status,
     elapsedMs,
-    sessionMs: openEnded ? Math.max(0, elapsedMs - openStart) : elapsedMs,
+    sessionMs: Math.max(0, Math.min(elapsedMs, clockedTo) - clockedFrom),
     totalMs,
     segment,
     nextSegment: index === -1 ? null : (segments[index + 1] ?? null),
@@ -128,7 +132,7 @@ export function useRunner(timer: Timer): Runner {
       durationMs === null || durationMs === 0
         ? 0
         : Math.min(1, Math.max(0, segmentElapsedMs / durationMs)),
-    round: segment?.round ?? 0,
+    round: clocked === -1 ? (segment?.round ?? 0) : laps.length,
     rounds,
     laps,
     openEnded,

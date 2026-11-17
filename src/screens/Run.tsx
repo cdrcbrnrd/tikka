@@ -66,7 +66,10 @@ function Session({ timer }: { timer: Timer }) {
     runner.start()
   }
 
-  const counting = runner.segment?.duration === null
+  const counting = runner.segment?.countUp === true
+  const tapping = runner.segment?.tapped === true
+  // a session that ran out while its figures were still climbing hit a cap, it did not finish
+  const capped = runner.completed && counting
   const urgent = runner.status === 'running' && !counting && runner.segmentRemainingMs <= 3000
   // the digits already carry the accent in the last seconds, the ring keeps its progress in muted
   const tone = runner.segment?.kind === 'work' && !urgent ? 'accent' : 'calm'
@@ -95,7 +98,7 @@ function Session({ timer }: { timer: Timer }) {
         <div className={styles.stage}>
           <div className={styles.summary}>
             <span className={styles.phase}>
-              {runner.completed ? 'Séance terminée' : 'Séance arrêtée'}
+              {!runner.completed ? 'Séance arrêtée' : capped ? 'Temps limite atteint' : 'Séance terminée'}
             </span>
             <span className={`${styles.summaryTime} digits`}>{clock(runner.sessionMs / 1000)}</span>
             {runner.rounds > 0 && (
@@ -118,6 +121,11 @@ function Session({ timer }: { timer: Timer }) {
           </ProgressRing>
 
           <div className={styles.under}>
+            {tapping && (
+              <span className={styles.taps}>
+                <span className="digits">{runner.round}</span> tours
+              </span>
+            )}
             <RoundDots round={runner.round} rounds={runner.rounds} />
             {runner.nextSegment && (
               <div className={styles.nextUp}>
@@ -146,7 +154,7 @@ function Session({ timer }: { timer: Timer }) {
 
         {runner.status === 'running' && (
           <>
-            {counting && (
+            {tapping && (
               <Button variant="accent" block onClick={runner.lap}>
                 Tour
               </Button>

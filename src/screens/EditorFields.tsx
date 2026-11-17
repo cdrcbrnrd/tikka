@@ -33,15 +33,26 @@ export default function EditorFields({ draft, setSetting }: Props) {
         <Stepper label="Cycles" value={draft.rounds} min={1} max={60} {...field('rounds')} />
       )}
 
-      {(draft.kind === 'emom' || draft.kind === 'exmom') && (
+      {'period' in draft && (
         <>
           <Duration label="Période" value={draft.period} min={MIN_DURATION} max={600} {...field('period')} />
           <Stepper label="Rounds" value={draft.rounds} min={1} max={60} {...field('rounds')} />
         </>
       )}
 
-      {(draft.kind === 'countdown' || draft.kind === 'rest') && (
+      {'duration' in draft && (
         <Duration label="Durée" value={draft.duration} min={MIN_DURATION} max={7200} {...field('duration')} />
+      )}
+
+      {'cap' in draft && (
+        <Duration
+          label="Temps limite"
+          value={draft.cap}
+          min={0}
+          max={7200}
+          format={(value) => (value > 0 ? clock(value) : 'Aucun')}
+          {...field('cap')}
+        />
       )}
 
       {'blocks' in draft && (
@@ -79,10 +90,11 @@ type DurationProps = {
   min: number
   max: number
   onChange: (value: number) => void
+  format?: (value: number) => string
 }
 
 // a duration can be typed, so its default reads as a value and not as a placeholder
-function Duration({ label, value, min, max, onChange }: DurationProps) {
+function Duration({ label, value, min, max, onChange, format = clock }: DurationProps) {
   return (
     <Stepper
       label={label}
@@ -90,7 +102,7 @@ function Duration({ label, value, min, max, onChange }: DurationProps) {
       min={min}
       max={max}
       onChange={onChange}
-      format={clock}
+      format={format}
       stepFor={durationStep}
       parse={parseClock}
     />

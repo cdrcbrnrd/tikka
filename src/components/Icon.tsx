@@ -7,6 +7,7 @@ import {
   Copy,
   FlagTriangleRight,
   Hourglass,
+  Infinity as Loop,
   Pencil,
   Plus,
   Repeat,
@@ -35,6 +36,7 @@ const ICONS = {
   alarm: AlarmClock,
   reset: TimerReset,
   flag: FlagTriangleRight,
+  loop: Loop,
 }
 
 export type IconName = keyof typeof ICONS

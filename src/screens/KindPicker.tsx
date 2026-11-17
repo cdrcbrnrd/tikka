@@ -13,6 +13,7 @@ const KIND_ICONS: Record<TimerKind, IconName> = {
   tabata: 'bolt',
   emom: 'alarm',
   exmom: 'reset',
+  amrap: 'loop',
   fortime: 'flag',
 }
 

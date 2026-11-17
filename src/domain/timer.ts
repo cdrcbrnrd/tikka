@@ -10,6 +10,7 @@ export const KINDS = [
   'tabata',
   'emom',
   'exmom',
+  'amrap',
   'fortime',
 ] as const
 
@@ -33,7 +34,8 @@ export type Timer = Common &
     | ({ kind: 'exmom'; period: number; rounds: number } & Blocked)
     | { kind: 'countdown'; duration: number }
     | { kind: 'rest'; duration: number }
-    | { kind: 'fortime'; cap: number | null }
+    | { kind: 'amrap'; duration: number }
+    | { kind: 'fortime'; cap: number }
     | { kind: 'stopwatch' }
   )
 
@@ -45,6 +47,7 @@ export const KIND_LABELS: Record<TimerKind, string> = {
   tabata: 'Tabata',
   emom: 'EMOM',
   exmom: 'E2MOM',
+  amrap: 'AMRAP',
   fortime: 'For Time',
 }
 
@@ -56,6 +59,7 @@ export const KIND_HINTS: Record<TimerKind, string> = {
   tabata: `Le format fixe, ${clockShort(TABATA_WORK)} d’effort et ${clockShort(TABATA_REST)} de repos`,
   emom: 'Un top à chaque période',
   exmom: 'Un top toutes les X minutes',
+  amrap: 'Le plus de tours possible dans le temps',
   fortime: 'Jusqu’à ce que le travail soit fini',
 }
 
@@ -67,7 +71,7 @@ export const KIND_GROUPS: { label: string; kinds: TimerKind[] }[] = [
   { label: 'Chrono', kinds: ['stopwatch', 'countdown', 'rest'] },
   { label: 'Intervalles', kinds: ['intervals', 'tabata'] },
   { label: 'À la minute', kinds: ['emom', 'exmom'] },
-  { label: 'CrossFit', kinds: ['fortime'] },
+  { label: 'CrossFit', kinds: ['amrap', 'fortime'] },
 ]
 
 // a card holds the name on one line beside its total, the field stops the athlete there
@@ -92,6 +96,7 @@ export const SETTINGS = [
   'duration',
   'blocks',
   'blockRest',
+  'cap',
 ] as const
 export type Setting = (typeof SETTINGS)[number]
 
@@ -107,12 +112,14 @@ export function blankTimer(kind: TimerKind, id: string): Timer {
       return { ...common, ...blocked, kind, period: 60, rounds: 12 }
     case 'exmom':
       return { ...common, ...blocked, kind, period: 120, rounds: 10 }
+    case 'amrap':
+      return { ...common, kind, duration: 600 }
     case 'countdown':
       return { ...common, kind, duration: 1200 }
     case 'rest':
       return { ...common, kind, prepare: 0, duration: 90 }
     case 'fortime':
-      return { ...common, kind, cap: null }
+      return { ...common, kind, cap: 0 }
     case 'stopwatch':
       return { ...common, kind }
   }
@@ -128,12 +135,16 @@ export function describe(timer: Timer): string {
     case 'emom':
     case 'exmom':
       return `${stack}${timer.rounds} rounds · période de ${clockShort(timer.period)}`
+    case 'amrap':
+      return `${clockShort(timer.duration)}, le plus de tours possible`
     case 'countdown':
       return `${clockShort(timer.duration)} en comptant à rebours`
     case 'rest':
       return `${clockShort(timer.duration)} de récupération`
     case 'fortime':
-      return timer.cap === null ? 'Chrono montant, sans limite' : `Chrono montant, ${clockShort(timer.cap)} au plus`
+      return timer.cap > 0
+        ? `Chrono montant, ${clockShort(timer.cap)} au plus`
+        : 'Chrono montant, sans limite'
     case 'stopwatch':
       return 'Chrono montant, tours à la main'
   }

@@ -9,9 +9,20 @@ export type Segment = {
   detail?: string
   duration: number | null
   round: number
+  // the clock the athlete reads goes up, even though a cap may end the segment
+  countUp?: boolean
+  // the athlete counts the rounds by hand, the clock cannot know them
+  tapped?: boolean
 }
 
-export type PlanStep = { label: string; work: number | null; rest: number; kind?: SegmentKind }
+export type PlanStep = {
+  label: string
+  work: number | null
+  rest: number
+  kind?: SegmentKind
+  countUp?: boolean
+  tapped?: boolean
+}
 
 export type PlanBlock = {
   label: string | null
@@ -46,13 +57,17 @@ function stacked(series: Blocked, steps: PlanStep[], repeat: number, numbered = 
   }))
 }
 
-function once(label: string, work: number | null, kind: SegmentKind = 'work'): PlanBlock {
+type Once = { kind?: SegmentKind; countUp?: boolean; tapped?: boolean }
+
+function once(label: string, work: number | null, options: Once = {}): PlanBlock {
+  const { kind = 'work', countUp = false, tapped = false } = options
   return {
     label: null,
-    steps: [{ label, work, rest: 0, kind }],
+    steps: [{ label, work, rest: 0, kind, countUp, tapped }],
     repeat: 1,
     rest: 0,
-    counts: work !== null,
+    // the plan counts no round it does not end itself, nor any the athlete keeps by hand
+    counts: work !== null && !countUp && !tapped,
     numbered: false,
   }
 }
@@ -82,14 +97,16 @@ export function planOf(timer: Timer): Plan {
         ...common,
         blocks: stacked(timer, [{ label: 'Round', work: timer.period, rest: 0 }], timer.rounds, true),
       }
+    case 'amrap':
+      return { ...common, blocks: [once('Effort', timer.duration, { tapped: true })] }
     case 'countdown':
       return { ...common, blocks: [once('En route', timer.duration)] }
     case 'rest':
-      return { ...common, blocks: [once('Repos', timer.duration, 'rest')] }
+      return { ...common, blocks: [once('Repos', timer.duration, { kind: 'rest' })] }
     case 'fortime':
-      return { ...common, blocks: [once('Chrono', timer.cap)] }
+      return { ...common, blocks: [once('Chrono', timer.cap > 0 ? timer.cap : null, { countUp: true })] }
     case 'stopwatch':
-      return { ...common, blocks: [once('Chrono', null)] }
+      return { ...common, blocks: [once('Chrono', null, { tapped: true })] }
   }
 }
 
@@ -115,7 +132,16 @@ export function expand(plan: Plan): Segment[] {
       for (const [position, step] of block.steps.entries()) {
         // the number the athlete reads has to be the one the screen counts, series after series
         const label = block.numbered ? `${step.label} ${round}` : step.label
-        segments.push({ kind: step.kind ?? 'work', label, detail, duration: step.work, round })
+        segments.push({
+          kind: step.kind ?? 'work',
+          label,
+          detail,
+          duration: step.work,
+          round,
+          // an open segment always counts up, there is nothing left for it to count down to
+          countUp: step.work === null || step.countUp === true,
+          tapped: step.tapped === true,
+        })
 
         // nothing may follow an open segment, which is what keeps it the last one
         if (step.work === null) {
@@ -146,6 +172,11 @@ export function expand(plan: Plan): Segment[] {
 
 export function buildSegments(timer: Timer): Segment[] {
   return expand(planOf(timer))
+}
+
+// the stretch the big figures measure: the whole session, unless one segment holds the clock
+export function clockedIndex(segments: Segment[]): number {
+  return segments.findIndex((segment) => segment.countUp === true || segment.tapped === true)
 }
 
 export function totalRounds(segments: Segment[]): number {

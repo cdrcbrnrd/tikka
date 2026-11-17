@@ -72,7 +72,8 @@ export default function History() {
 
 function detail(session: Session): string {
   const parts: string[] = []
-  if (session.roundsDone > 0) parts.push(plural(session.roundsDone, 'round'))
+  if (session.roundsDone > 0 && session.roundsDone !== session.laps.length)
+    parts.push(plural(session.roundsDone, 'round'))
   if (session.laps.length > 0) parts.push(plural(session.laps.length, 'tour'))
   if (!session.completed) parts.push('arrêtée en route')
   return parts.join(' · ')
