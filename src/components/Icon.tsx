@@ -8,6 +8,7 @@ import {
   FlagTriangleRight,
   Hourglass,
   Infinity as Loop,
+  ListOrdered,
   Pencil,
   Plus,
   Repeat,
@@ -15,6 +16,7 @@ import {
   Timer,
   TimerReset,
   Trash2,
+  TrendingUp,
   Zap,
 } from 'lucide-react'
 
@@ -37,6 +39,8 @@ const ICONS = {
   reset: TimerReset,
   flag: FlagTriangleRight,
   loop: Loop,
+  list: ListOrdered,
+  climb: TrendingUp,
 }
 
 export type IconName = keyof typeof ICONS

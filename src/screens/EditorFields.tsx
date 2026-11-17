@@ -1,17 +1,27 @@
+import Duration from '../components/Duration.tsx'
+import StepList from '../components/StepList.tsx'
 import Stepper from '../components/Stepper.tsx'
-import { clock, parseClock } from '../domain/format.ts'
-import { isOpenEnded, takesPrepare, type Setting, type Timer } from '../domain/timer.ts'
+import { clock } from '../domain/format.ts'
+import {
+  isOpenEnded,
+  MAX_DURATION,
+  MIN_DURATION,
+  takesPrepare,
+  type Setting,
+  type Timer,
+} from '../domain/timer.ts'
 
-const MIN_DURATION = 5
 const MAX_SIDE = 1800
 
 type Props = {
   draft: Timer
-  setSetting: (key: Setting, value: number) => void
+  patch: (changes: Partial<Timer>) => void
 }
 
-export default function EditorFields({ draft, setSetting }: Props) {
-  const field = (key: Setting) => ({ onChange: (value: number) => setSetting(key, value) })
+export default function EditorFields({ draft, patch }: Props) {
+  const field = (key: Setting) => ({
+    onChange: (value: number) => patch({ [key]: value } as Partial<Timer>),
+  })
 
   return (
     <>
@@ -23,14 +33,22 @@ export default function EditorFields({ draft, setSetting }: Props) {
 
       {draft.kind === 'intervals' && (
         <>
-          <Duration label="Effort" value={draft.work} min={MIN_DURATION} max={3600} {...field('work')} />
-          <Duration label="Repos" value={draft.rest} min={0} max={3600} {...field('rest')} />
+          <Duration label="Effort" value={draft.work} min={MIN_DURATION} max={MAX_DURATION} {...field('work')} />
+          <Duration label="Repos" value={draft.rest} min={0} max={MAX_DURATION} {...field('rest')} />
           <Stepper label="Séries" value={draft.rounds} min={1} max={60} {...field('rounds')} />
         </>
       )}
 
       {draft.kind === 'tabata' && (
         <Stepper label="Cycles" value={draft.rounds} min={1} max={60} {...field('rounds')} />
+      )}
+
+      {'steps' in draft && (
+        <>
+          <StepList steps={draft.steps} kind={draft.kind} onChange={(steps) => patch({ steps })} />
+          <Duration label="Repos" value={draft.rest} min={0} max={600} {...field('rest')} />
+          <Stepper label="Tours" value={draft.rounds} min={1} max={60} {...field('rounds')} />
+        </>
       )}
 
       {'period' in draft && (
@@ -82,44 +100,4 @@ export default function EditorFields({ draft, setSetting }: Props) {
       )}
     </>
   )
-}
-
-type DurationProps = {
-  label: string
-  value: number
-  min: number
-  max: number
-  onChange: (value: number) => void
-  format?: (value: number) => string
-}
-
-// a duration can be typed, so its default reads as a value and not as a placeholder
-function Duration({ label, value, min, max, onChange, format = clock }: DurationProps) {
-  return (
-    <Stepper
-      label={label}
-      value={value}
-      min={min}
-      max={max}
-      onChange={onChange}
-      format={format}
-      stepFor={durationStep}
-      parse={parseClock}
-    />
-  )
-}
-
-// a flat step would put a 20 min countdown a hundred presses away, or make 20 s unreachable
-function stepAt(seconds: number): number {
-  if (seconds < 60) return 5
-  if (seconds < 300) return 15
-  return 60
-}
-
-// a saved duration may sit off the grid, the first press lands on it instead of past it
-function durationStep(value: number, direction: 1 | -1): number {
-  const step = direction === 1 ? stepAt(value) : stepAt(value - 1)
-  const offGrid = value % step
-  if (offGrid === 0) return step
-  return direction === 1 ? step - offGrid : offGrid
 }

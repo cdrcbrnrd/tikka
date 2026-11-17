@@ -33,6 +33,11 @@ export type PlanBlock = {
   numbered: boolean
 }
 
+export const STEP_WORD = {
+  circuit: { one: 'Exercice', add: 'un exercice' },
+  ladder: { one: 'Palier', add: 'un palier' },
+} as const
+
 // tabata is a format, not a setting: these two are what makes it one
 export const TABATA_WORK = 20
 export const TABATA_REST = 10
@@ -91,6 +96,23 @@ export function planOf(timer: Timer): Plan {
         ...common,
         blocks: stacked(timer, [{ label: 'Effort', work: TABATA_WORK, rest: TABATA_REST }], timer.rounds),
       }
+    case 'circuit':
+    case 'ladder':
+    {
+      const word = STEP_WORD[timer.kind].one
+      return {
+        ...common,
+        blocks: stacked(
+          timer,
+          timer.steps.map((step, index) => ({
+            label: step.label.trim() || `${word} ${index + 1}`,
+            work: step.duration,
+            rest: timer.rest,
+          })),
+          timer.rounds,
+        ),
+      }
+    }
     case 'emom':
     case 'exmom':
       return {

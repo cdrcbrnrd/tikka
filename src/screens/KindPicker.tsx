@@ -11,6 +11,8 @@ const KIND_ICONS: Record<TimerKind, IconName> = {
   rest: 'coffee',
   intervals: 'repeat',
   tabata: 'bolt',
+  circuit: 'list',
+  ladder: 'climb',
   emom: 'alarm',
   exmom: 'reset',
   amrap: 'loop',

@@ -11,7 +11,6 @@ import {
   KIND_HINTS,
   KIND_LABELS,
   NAME_MAX,
-  type Setting,
   type Timer,
 } from '../domain/timer.ts'
 import { useTimers } from '../store/timers.ts'
@@ -37,9 +36,7 @@ function Form({ initial, isNew }: { initial: Timer; isNew: boolean }) {
   const upsert = useTimers((state) => state.upsert)
   const navigate = useNavigate()
 
-  const setSetting = (key: Setting, value: number) => {
-    setDraft((current) => ({ ...current, [key]: value }) as Timer)
-  }
+  const patch = (changes: Partial<Timer>) => setDraft((current) => ({ ...current, ...changes }) as Timer)
 
   const name = draft.name.trim()
   const head = isNew
@@ -61,7 +58,7 @@ function Form({ initial, isNew }: { initial: Timer; isNew: boolean }) {
 
       <div className={`${styles.form} grow`}>
         <div className={styles.group}>
-          <EditorFields draft={draft} setSetting={setSetting} />
+          <EditorFields draft={draft} patch={patch} />
         </div>
 
         <div className={styles.group}>
@@ -70,12 +67,12 @@ function Form({ initial, isNew }: { initial: Timer; isNew: boolean }) {
           </label>
           <input
             id="nom"
-            className={styles.name}
+            className="text-input"
             type="text"
             value={draft.name}
             maxLength={NAME_MAX}
             placeholder="Nom du chrono"
-            onChange={(event) => setDraft((current) => ({ ...current, name: event.target.value }))}
+            onChange={(event) => patch({ name: event.target.value })}
           />
         </div>
       </div>

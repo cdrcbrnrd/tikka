@@ -1,6 +1,6 @@
-import { clockShort, NBSP } from './format.ts'
+import { clockShort, NBSP, plural } from './format.ts'
 import { newId } from './id.ts'
-import { buildSegments, TABATA_REST, TABATA_WORK, type Segment } from './plan.ts'
+import { buildSegments, STEP_WORD, TABATA_REST, TABATA_WORK, type Segment } from './plan.ts'
 
 export const KINDS = [
   'stopwatch',
@@ -8,6 +8,8 @@ export const KINDS = [
   'rest',
   'intervals',
   'tabata',
+  'circuit',
+  'ladder',
   'emom',
   'exmom',
   'amrap',
@@ -26,10 +28,24 @@ type Common = {
 
 export type Blocked = { blocks: number; blockRest: number; keepLastRest: boolean }
 
+// an id of its own, so a row keeps its identity while the list is edited around it
+export type TimerStep = { id: string; label: string; duration: number }
+
+export const STEPS_MAX = 20
+export const STEP_DURATION = 40
+
+// the bounds every duration field shares, wherever it is rendered
+export const MIN_DURATION = 5
+export const MAX_DURATION = 3600
+
+type Listed = { steps: TimerStep[]; rest: number; rounds: number }
+
 export type Timer = Common &
   (
     | ({ kind: 'intervals'; work: number; rest: number; rounds: number } & Blocked)
     | ({ kind: 'tabata'; rounds: number } & Blocked)
+    | ({ kind: 'circuit' } & Listed & Blocked)
+    | ({ kind: 'ladder' } & Listed & Blocked)
     | ({ kind: 'emom'; period: number; rounds: number } & Blocked)
     | ({ kind: 'exmom'; period: number; rounds: number } & Blocked)
     | { kind: 'countdown'; duration: number }
@@ -45,6 +61,8 @@ export const KIND_LABELS: Record<TimerKind, string> = {
   rest: 'Repos entre séries',
   intervals: 'Intervalles',
   tabata: 'Tabata',
+  circuit: 'Circuit',
+  ladder: 'Ladder',
   emom: 'EMOM',
   exmom: 'E2MOM',
   amrap: 'AMRAP',
@@ -57,6 +75,8 @@ export const KIND_HINTS: Record<TimerKind, string> = {
   rest: 'Une récupération lancée à la main',
   intervals: 'Effort et repos qui alternent',
   tabata: `Le format fixe, ${clockShort(TABATA_WORK)} d’effort et ${clockShort(TABATA_REST)} de repos`,
+  circuit: 'Des exercices qui s’enchaînent',
+  ladder: 'Des paliers de durées différentes',
   emom: 'Un top à chaque période',
   exmom: 'Un top toutes les X minutes',
   amrap: 'Le plus de tours possible dans le temps',
@@ -69,7 +89,7 @@ export function isKind(value: string | undefined): value is TimerKind {
 
 export const KIND_GROUPS: { label: string; kinds: TimerKind[] }[] = [
   { label: 'Chrono', kinds: ['stopwatch', 'countdown', 'rest'] },
-  { label: 'Intervalles', kinds: ['intervals', 'tabata'] },
+  { label: 'Intervalles', kinds: ['intervals', 'tabata', 'circuit', 'ladder'] },
   { label: 'À la minute', kinds: ['emom', 'exmom'] },
   { label: 'CrossFit', kinds: ['amrap', 'fortime'] },
 ]
@@ -108,6 +128,17 @@ export function blankTimer(kind: TimerKind, id: string): Timer {
       return { ...common, ...blocked, kind, work: 60, rest: 30, rounds: 8 }
     case 'tabata':
       return { ...common, ...blocked, kind, rounds: 8 }
+    case 'circuit':
+      return { ...common, ...blocked, kind, steps: [step('')], rest: 20, rounds: 3 }
+    case 'ladder':
+      return {
+        ...common,
+        ...blocked,
+        kind,
+        steps: [step('', 20), step('', 40), step('', 60)],
+        rest: 20,
+        rounds: 1,
+      }
     case 'emom':
       return { ...common, ...blocked, kind, period: 60, rounds: 12 }
     case 'exmom':
@@ -125,6 +156,10 @@ export function blankTimer(kind: TimerKind, id: string): Timer {
   }
 }
 
+function step(label: string, duration = STEP_DURATION): TimerStep {
+  return { id: newId(), label, duration }
+}
+
 export function describe(timer: Timer): string {
   const stack = 'blocks' in timer && timer.blocks > 1 ? `${timer.blocks} blocs de ` : ''
   switch (timer.kind) {
@@ -132,6 +167,12 @@ export function describe(timer: Timer): string {
       return `${stack}${timer.rounds} séries · ${clockShort(timer.work)} / ${clockShort(timer.rest)}`
     case 'tabata':
       return `${stack}${timer.rounds} cycles · ${clockShort(TABATA_WORK)} / ${clockShort(TABATA_REST)}`
+    case 'circuit':
+    case 'ladder': {
+      const word = STEP_WORD[timer.kind].one.toLowerCase()
+      // the stack repeats the rounds, not the list, so it cannot lead the sentence here
+      return `${plural(timer.steps.length, word)} · ${stack}${plural(timer.rounds, 'tour')}`
+    }
     case 'emom':
     case 'exmom':
       return `${stack}${timer.rounds} rounds · période de ${clockShort(timer.period)}`
@@ -169,5 +210,7 @@ export function totalShort(timer: Timer): string | null {
 }
 
 export function copyOf(timer: Timer): Timer {
-  return { ...timer, id: newId(), name: `${timer.name} (copie)` }
+  const copy = { ...timer, id: newId(), name: `${timer.name} (copie)` }
+  // a flat spread would hand the copy the same rows, and two chronos would share their ids
+  return 'steps' in copy ? { ...copy, steps: copy.steps.map((item) => ({ ...item, id: newId() })) } : copy
 }
