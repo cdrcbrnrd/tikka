@@ -22,8 +22,9 @@ export const useTimers = create<TimersState>()(
         }),
       remove: (id) => set((state) => ({ timers: state.timers.filter((item) => item.id !== id) })),
     }),
-    // the stored shape gained its series fields in one go, and old chronos are not worth carrying over
-    { name: 'tikka.timers', version: 2, migrate: () => ({ timers: [] }) },
+    // a kind the running bundle cannot expand would crash the home screen, and the installed app
+    // serves the previous one until a cold start: every new kind raises this, and starts from empty
+    { name: 'tikka.timers', version: 3, migrate: () => ({ timers: [] }) },
   ),
 )
 

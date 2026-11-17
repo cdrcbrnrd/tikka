@@ -95,6 +95,11 @@ l'app installée continue de servir la version précédente jusqu'à un démarra
 une recette qui ne voit pas un changement poussé est d'abord un soupçon de cache, pas de code.
 Il n'existe aucun bandeau « nouvelle version », c'est assumé.
 
+Conséquence directe sur le stockage : **ajouter un type de chrono veut dire monter la `version`
+de `tikka.timers`** (`src/store/timers.ts`). Sans ça, le bundle précédent relit un type qu'il ne
+sait pas déplier, `planOf` ne rend rien et l'écran d'accueil plante jusqu'au démarrage à froid ;
+avec, il repart d'une liste vide. La migration efface les chronos, c'est le prix assumé.
+
 ## Conventions
 
 - **Styles** : un `*.module.css` par écran et par composant, plus des classes utilitaires globales dans `global.css` (`.screen`, `.screen-footer`, `.screen-head`, `.screen-intro`, `.title`, `.subtle`,
