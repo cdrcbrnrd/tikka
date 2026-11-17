@@ -5,9 +5,9 @@ import Button from '../components/Button.tsx'
 import IconButton from '../components/IconButton.tsx'
 import ProgressRing from '../components/ProgressRing.tsx'
 import RoundDots from '../components/RoundDots.tsx'
-import { clock, clockTenths, plural, splits } from '../domain/format.ts'
+import { clock, clockTenths, plural, pluralWord, splits } from '../domain/format.ts'
 import { newId } from '../domain/id.ts'
-import type { Timer } from '../domain/timer.ts'
+import { KIND_ROUND, type Timer } from '../domain/timer.ts'
 import { releaseAudio } from '../engine/cues.ts'
 import { useAudioSession } from '../engine/useAudioSession.ts'
 import { useRunner } from '../engine/useRunner.ts'
@@ -67,6 +67,7 @@ function Session({ timer }: { timer: Timer }) {
     runner.start()
   }
 
+  const word = KIND_ROUND[timer.kind]
   const counting = runner.segment?.countUp === true
   const tapping = runner.segment?.tapped === true
   // a session that ran out while its figures were still climbing hit a cap, it did not finish
@@ -90,7 +91,7 @@ function Session({ timer }: { timer: Timer }) {
         )}
         {runner.rounds > 1 && runner.status !== 'done' && (
           <span className="subtle digits">
-            Round {Math.max(1, runner.round)} / {runner.rounds}
+            {word} {Math.max(1, runner.round)} / {runner.rounds}
           </span>
         )}
       </header>
@@ -104,7 +105,7 @@ function Session({ timer }: { timer: Timer }) {
             <span className={`${styles.summaryTime} digits`}>{clock(runner.sessionMs / 1000)}</span>
             {runner.rounds > 0 && (
               <span className="subtle">
-                {plural(runner.round, 'round')} sur {runner.rounds}
+                {plural(runner.round, word.toLowerCase())} sur {runner.rounds}
               </span>
             )}
           </div>
@@ -125,7 +126,8 @@ function Session({ timer }: { timer: Timer }) {
             {tapping && (
               <div className={styles.taps}>
                 <span className={styles.tapCount}>
-                  <span className="digits">{runner.round}</span> tours
+                  <span className="digits">{runner.round}</span>{' '}
+                  {pluralWord(runner.round, word.toLowerCase())}
                 </span>
                 {/* kept in place with nothing to undo, so the count never shifts under the thumb */}
                 <IconButton

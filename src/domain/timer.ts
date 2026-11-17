@@ -62,7 +62,7 @@ export const KIND_LABELS: Record<TimerKind, string> = {
   intervals: 'Intervalles',
   tabata: 'Tabata',
   circuit: 'Circuit',
-  ladder: 'Ladder',
+  ladder: 'Pyramide',
   emom: 'EMOM',
   exmom: 'E2MOM',
   amrap: 'AMRAP',
@@ -76,7 +76,7 @@ export const KIND_HINTS: Record<TimerKind, string> = {
   intervals: 'Effort et repos qui alternent',
   tabata: `Le format fixe, ${clockShort(TABATA_WORK)} d’effort et ${clockShort(TABATA_REST)} de repos`,
   circuit: 'Des exercices qui s’enchaînent',
-  ladder: 'Des paliers de durées différentes',
+  ladder: 'Des paliers qui montent, puis redescendent',
   emom: 'Un top à chaque période',
   exmom: 'Un top toutes les X minutes',
   amrap: 'Le plus de tours possible dans le temps',
@@ -85,6 +85,21 @@ export const KIND_HINTS: Record<TimerKind, string> = {
 
 export function isKind(value: string | undefined): value is TimerKind {
   return KINDS.some((kind) => kind === value)
+}
+
+// the word a kind counts in, so the screen that runs it speaks like the screen that set it
+export const KIND_ROUND: Record<TimerKind, string> = {
+  stopwatch: 'Tour',
+  countdown: 'Round',
+  rest: 'Round',
+  intervals: 'Série',
+  tabata: 'Cycle',
+  circuit: 'Tour',
+  ladder: 'Tour',
+  emom: 'Round',
+  exmom: 'Round',
+  amrap: 'Tour',
+  fortime: 'Round',
 }
 
 export const KIND_GROUPS: { label: string; kinds: TimerKind[] }[] = [

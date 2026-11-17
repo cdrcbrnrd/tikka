@@ -3,6 +3,7 @@ import BackLink from '../components/BackLink.tsx'
 import Button from '../components/Button.tsx'
 import Confirm from '../components/Confirm.tsx'
 import { clock, plural, sessionDate } from '../domain/format.ts'
+import { KIND_ROUND } from '../domain/timer.ts'
 import { useHistory, type Session } from '../store/history.ts'
 import styles from './History.module.css'
 
@@ -72,8 +73,10 @@ export default function History() {
 
 function detail(session: Session): string {
   const parts: string[] = []
+  // a session is kept for good, and its kind outlives any list this build happens to know
+  const word = (KIND_ROUND[session.kind] ?? 'Round').toLowerCase()
   if (session.roundsDone > 0 && session.roundsDone !== session.laps.length)
-    parts.push(plural(session.roundsDone, 'round'))
+    parts.push(plural(session.roundsDone, word))
   if (session.laps.length > 0) parts.push(plural(session.laps.length, 'tour'))
   if (!session.completed) parts.push('arrêtée en route')
   return parts.join(' · ')

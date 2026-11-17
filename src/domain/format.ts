@@ -42,8 +42,12 @@ export function parseClock(text: string): number | null {
   return hours * 3600 + minutes * 60 + seconds
 }
 
+export function pluralWord(count: number, word: string): string {
+  return `${word}${count > 1 ? 's' : ''}`
+}
+
 export function plural(count: number, word: string): string {
-  return `${count} ${word}${count > 1 ? 's' : ''}`
+  return `${count} ${pluralWord(count, word)}`
 }
 
 export function splits(laps: number[]): number[] {
