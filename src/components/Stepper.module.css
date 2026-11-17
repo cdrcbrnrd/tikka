@@ -17,7 +17,7 @@
 .controls {
   display: flex;
   align-items: center;
-  gap: var(--space-2);
+  gap: var(--space-1);
 }
 
 .step {
@@ -37,17 +37,40 @@
   touch-action: manipulation;
 }
 
-.step:active:not(:disabled) {
-  background: var(--surface-active);
-}
-
 .step:disabled {
   opacity: 0.3;
 }
 
 .value {
-  min-width: 4.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  /* a floor rather than a fit, so the usual values keep every row's − and + in line */
+  min-width: 4.25rem;
+  height: var(--tap);
+  padding: 0 var(--space-1);
   text-align: center;
   font-size: var(--text-lg);
   font-weight: 500;
+  color: var(--text);
+  border-radius: var(--radius-sm);
+  transition: background var(--transition);
+  /* the value is a tap target now, and double-tap zoom would fire between two presses */
+  touch-action: manipulation;
+}
+
+.step:active:not(:disabled),
+.value:active {
+  background: var(--surface-active);
+}
+
+.typing {
+  /* an input carries a default width of its own, which would push the row off the screen */
+  width: 4.25rem;
+  background: var(--surface-active);
+}
+
+.typing::selection {
+  background: var(--accent);
+  color: var(--on-accent);
 }

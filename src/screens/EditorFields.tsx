@@ -1,5 +1,5 @@
 import Stepper from '../components/Stepper.tsx'
-import { clock } from '../domain/format.ts'
+import { clock, parseClock } from '../domain/format.ts'
 import { takesPrepare, type Setting, type Timer } from '../domain/timer.ts'
 
 const MIN_DURATION = 5
@@ -11,10 +11,8 @@ type Props = {
 }
 
 export default function EditorFields({ draft, suggested, setSetting }: Props) {
-  const field = (key: Setting) => ({
-    suggested: suggested.has(key),
-    onChange: (value: number) => setSetting(key, value),
-  })
+  const field = (key: Setting) => ({ onChange: (value: number) => setSetting(key, value) })
+  const rounds = { suggested: suggested.has('rounds'), ...field('rounds') }
 
   return (
     <>
@@ -26,18 +24,18 @@ export default function EditorFields({ draft, suggested, setSetting }: Props) {
         <>
           <Duration label="Effort" value={draft.work} min={MIN_DURATION} max={3600} {...field('work')} />
           <Duration label="Repos" value={draft.rest} min={0} max={3600} {...field('rest')} />
-          <Stepper label="Séries" value={draft.rounds} min={1} max={60} {...field('rounds')} />
+          <Stepper label="Séries" value={draft.rounds} min={1} max={60} {...rounds} />
         </>
       )}
 
       {draft.kind === 'tabata' && (
-        <Stepper label="Cycles" value={draft.rounds} min={1} max={60} {...field('rounds')} />
+        <Stepper label="Cycles" value={draft.rounds} min={1} max={60} {...rounds} />
       )}
 
       {(draft.kind === 'emom' || draft.kind === 'exmom') && (
         <>
           <Duration label="Période" value={draft.period} min={MIN_DURATION} max={600} {...field('period')} />
-          <Stepper label="Rounds" value={draft.rounds} min={1} max={60} {...field('rounds')} />
+          <Stepper label="Rounds" value={draft.rounds} min={1} max={60} {...rounds} />
         </>
       )}
 
@@ -54,10 +52,10 @@ type DurationProps = {
   min: number
   max: number
   onChange: (value: number) => void
-  suggested: boolean
 }
 
-function Duration({ label, value, min, max, onChange, suggested }: DurationProps) {
+// a duration can be typed, so its default reads as a value and not as a placeholder
+function Duration({ label, value, min, max, onChange }: DurationProps) {
   return (
     <Stepper
       label={label}
@@ -67,7 +65,7 @@ function Duration({ label, value, min, max, onChange, suggested }: DurationProps
       onChange={onChange}
       format={clock}
       stepFor={durationStep}
-      suggested={suggested}
+      parse={parseClock}
     />
   )
 }

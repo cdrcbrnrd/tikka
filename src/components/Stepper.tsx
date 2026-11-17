@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import styles from './Stepper.module.css'
 
 type Props = {
@@ -9,6 +9,7 @@ type Props = {
   onChange: (value: number) => void
   format?: (value: number) => string
   stepFor?: (value: number, direction: 1 | -1) => number
+  parse?: (text: string) => number | null
   suggested?: boolean
 }
 
@@ -23,14 +24,18 @@ export default function Stepper({
   onChange,
   format = String,
   stepFor = () => 1,
+  parse,
   suggested = false,
 }: Props) {
+  const [typed, setTyped] = useState<string | null>(null)
   const latest = useRef(value)
   const release = useRef<(() => void) | null>(null)
 
   useEffect(() => {
     latest.current = value
   }, [value])
+
+  const clamp = (n: number) => Math.min(max, Math.max(min, n))
 
   const stopHold = () => {
     release.current?.()
@@ -42,13 +47,19 @@ export default function Stepper({
   // the repeat reads the ref, a closure over the prop would keep applying the same step
   const bump = (direction: 1 | -1) => {
     const current = latest.current
-    const next = Math.min(max, Math.max(min, current + direction * stepFor(current, direction)))
+    const next = clamp(current + direction * stepFor(current, direction))
     if (next === current) {
       stopHold()
       return
     }
     latest.current = next
     onChange(next)
+  }
+
+  const commit = (text: string) => {
+    const parsed = parse?.(text) ?? null
+    if (parsed !== null) onChange(clamp(parsed))
+    setTyped(null)
   }
 
   const startHold = (direction: 1 | -1) => {
@@ -86,9 +97,35 @@ export default function Stepper({
         >
           −
         </button>
-        <span className={`${styles.value} digits ${suggested ? 'muted' : ''}`}>
-          {format(value)}
-        </span>
+        {typed === null && parse === undefined ? (
+          <span className={`${styles.value} digits ${suggested ? 'muted' : ''}`}>{format(value)}</span>
+        ) : typed === null ? (
+          <button
+            type="button"
+            className={`${styles.value} digits ${suggested ? 'muted' : ''}`}
+            aria-label={`Saisir ${label}`}
+            onClick={() => setTyped(format(value))}
+          >
+            {format(value)}
+          </button>
+        ) : (
+          <input
+            className={`${styles.value} ${styles.typing} digits`}
+            type="text"
+            inputMode="numeric"
+            aria-label={label}
+            value={typed}
+            autoFocus
+            // the whole value goes on the first keystroke, nothing to erase before typing
+            onFocus={(event) => event.target.select()}
+            onChange={(event) => setTyped(event.target.value)}
+            onBlur={(event) => commit(event.target.value)}
+            onKeyDown={(event) => {
+              if (event.key === 'Enter') commit(event.currentTarget.value)
+              if (event.key === 'Escape') setTyped(null)
+            }}
+          />
+        )}
         <button
           type="button"
           className={styles.step}

@@ -32,6 +32,16 @@ export function clockShort(seconds: number): string {
   return rest === 0 ? `${minutes}${NBSP}min` : `${minutes}${NBSP}min ${rest}${NBSP}s`
 }
 
+// read right to left like a stopwatch, the mirror of clock: 130 is a minute and a half
+export function parseClock(text: string): number | null {
+  const digits = text.replace(/\D/g, '')
+  if (digits === '') return null
+  const seconds = Number(digits.slice(-2))
+  const minutes = Number(digits.slice(-4, -2) || 0)
+  const hours = Number(digits.slice(0, -4) || 0)
+  return hours * 3600 + minutes * 60 + seconds
+}
+
 export function plural(count: number, word: string): string {
   return `${count} ${word}${count > 1 ? 's' : ''}`
 }
