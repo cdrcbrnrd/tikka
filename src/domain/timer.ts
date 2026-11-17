@@ -230,6 +230,17 @@ export function totalShort(timer: Timer): string | null {
   return `${Math.round(seconds / 60)}${NBSP}min`
 }
 
+// the name a new chrono opens with: its kind, numbered if the athlete already has one
+export function freeName(kind: TimerKind, timers: Timer[]): string {
+  const base = KIND_LABELS[kind]
+  const taken = (name: string) => timers.some((timer) => timer.name === name)
+  if (!taken(base)) return base
+  for (let suffix = 2; suffix < 100; suffix += 1) {
+    if (!taken(`${base} ${suffix}`)) return `${base} ${suffix}`
+  }
+  return base
+}
+
 export function copyOf(timer: Timer): Timer {
   const copy = { ...timer, id: newId(), name: `${timer.name} (copie)` }
   // a flat spread would hand the copy the same rows, and two chronos would share their ids

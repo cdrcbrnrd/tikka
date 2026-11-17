@@ -7,6 +7,7 @@ import { newId } from '../domain/id.ts'
 import {
   blankTimer,
   describe,
+  freeName,
   isKind,
   KIND_HINTS,
   KIND_LABELS,
@@ -28,7 +29,9 @@ export default function Editor() {
   if (id) return <Navigate to="/" replace />
   if (!isKind(kind)) return <Navigate to="/chrono/nouveau" replace />
   // two kinds share this route, and without a key the draft would keep the first one
-  return <Form key={kind} initial={blankTimer(kind, draftId)} isNew />
+  return (
+    <Form key={kind} initial={{ ...blankTimer(kind, draftId), name: freeName(kind, timers) }} isNew />
+  )
 }
 
 function Form({ initial, isNew }: { initial: Timer; isNew: boolean }) {
@@ -44,7 +47,8 @@ function Form({ initial, isNew }: { initial: Timer; isNew: boolean }) {
     : { to: '/', label: 'Mes chronos', title: draft.name, hint: KIND_LABELS[draft.kind] }
 
   const save = () => {
-    upsert({ ...draft, name })
+    // the field opens filled, so an empty one is an athlete who cleared it rather than named it
+    upsert({ ...draft, name: name === '' ? KIND_LABELS[draft.kind] : name })
     navigate('/')
   }
 
@@ -80,7 +84,7 @@ function Form({ initial, isNew }: { initial: Timer; isNew: boolean }) {
           <span className="subtle one-line">{describe(draft)}</span>
           <Total timer={draft} />
         </div>
-        <Button variant="accent" block disabled={name === ''} onClick={save}>
+        <Button variant="accent" block onClick={save}>
           Enregistrer
         </Button>
       </div>
