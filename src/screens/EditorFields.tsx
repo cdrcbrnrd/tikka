@@ -1,8 +1,9 @@
 import Stepper from '../components/Stepper.tsx'
 import { clock, parseClock } from '../domain/format.ts'
-import { takesPrepare, type Setting, type Timer } from '../domain/timer.ts'
+import { isOpenEnded, takesPrepare, type Setting, type Timer } from '../domain/timer.ts'
 
 const MIN_DURATION = 5
+const MAX_SIDE = 1800
 
 type Props = {
   draft: Timer
@@ -17,6 +18,8 @@ export default function EditorFields({ draft, setSetting }: Props) {
       {takesPrepare(draft.kind) && (
         <Duration label="Préparation" value={draft.prepare} min={0} max={120} {...field('prepare')} />
       )}
+
+      <Duration label="Échauffement" value={draft.warmup} min={0} max={MAX_SIDE} {...field('warmup')} />
 
       {draft.kind === 'intervals' && (
         <>
@@ -39,6 +42,17 @@ export default function EditorFields({ draft, setSetting }: Props) {
 
       {(draft.kind === 'countdown' || draft.kind === 'rest') && (
         <Duration label="Durée" value={draft.duration} min={MIN_DURATION} max={7200} {...field('duration')} />
+      )}
+
+      {/* nothing can follow a segment the athlete closes by hand, the field would set a dead value */}
+      {!isOpenEnded(draft) && (
+        <Duration
+          label="Retour au calme"
+          value={draft.cooldown}
+          min={0}
+          max={MAX_SIDE}
+          {...field('cooldown')}
+        />
       )}
     </>
   )

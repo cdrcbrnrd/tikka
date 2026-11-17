@@ -1,6 +1,6 @@
 import { clockShort, NBSP } from './format.ts'
 import { newId } from './id.ts'
-import { buildSegments, TABATA_REST, TABATA_WORK } from './plan.ts'
+import { buildSegments, TABATA_REST, TABATA_WORK, type Segment } from './plan.ts'
 
 export const KINDS = [
   'stopwatch',
@@ -81,7 +81,16 @@ export function takesPrepare(kind: TimerKind): boolean {
 }
 
 // the numeric fields an editor can set, typed so a key can never drift from the model
-export const SETTINGS = ['prepare', 'work', 'rest', 'rounds', 'period', 'duration'] as const
+export const SETTINGS = [
+  'prepare',
+  'warmup',
+  'cooldown',
+  'work',
+  'rest',
+  'rounds',
+  'period',
+  'duration',
+] as const
 export type Setting = (typeof SETTINGS)[number]
 
 export function blankTimer(kind: TimerKind, id: string): Timer {
@@ -127,10 +136,19 @@ export function describe(timer: Timer): string {
   }
 }
 
+function openEnded(segments: Segment[]): boolean {
+  return segments.some((segment) => segment.duration === null)
+}
+
+// a timer that runs until the athlete stops it: it has no total, and nothing can follow it
+export function isOpenEnded(timer: Timer): boolean {
+  return openEnded(buildSegments(timer))
+}
+
 // the figure the athlete picks a timer on, rounded to the minute: an open-ended timer has none
 export function totalShort(timer: Timer): string | null {
   const segments = buildSegments(timer)
-  if (segments.some((segment) => segment.duration === null)) return null
+  if (openEnded(segments)) return null
   const seconds = segments.reduce((total, segment) => total + (segment.duration ?? 0), 0)
   if (seconds < 60) return `${seconds}${NBSP}s`
   return `${Math.round(seconds / 60)}${NBSP}min`

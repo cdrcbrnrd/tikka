@@ -2,8 +2,9 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: var(--space-3);
-  padding: var(--space-3) var(--space-4);
+  /* the label column is what is left over, and a wrapped label makes its row taller than the rest */
+  gap: var(--space-2);
+  padding: var(--space-3);
   background: var(--surface);
   border: 1px solid var(--line);
   border-radius: var(--radius);
