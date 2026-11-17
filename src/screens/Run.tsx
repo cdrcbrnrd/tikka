@@ -100,7 +100,7 @@ function Session({ timer }: { timer: Timer }) {
         <div className={styles.stage}>
           <div className={styles.summary}>
             <span className={styles.phase}>
-              {!runner.completed ? 'Séance arrêtée' : capped ? 'Temps limite atteint' : 'Séance terminée'}
+              {!runner.completed ? 'Séance arrêtée' : capped ? 'Time cap atteint' : 'Séance terminée'}
             </span>
             <span className={`${styles.summaryTime} digits`}>{clock(runner.sessionMs / 1000)}</span>
             {runner.rounds > 0 && (

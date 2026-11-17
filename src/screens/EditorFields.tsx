@@ -70,7 +70,7 @@ export default function EditorFields({ draft, patch }: Props) {
 
         {'cap' in draft && (
           <Duration
-            label="Temps limite"
+            label="Time cap"
             value={draft.cap}
             min={0}
             max={7200}
