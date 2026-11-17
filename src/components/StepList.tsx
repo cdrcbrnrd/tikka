@@ -1,6 +1,7 @@
 import Button from './Button.tsx'
 import Duration from './Duration.tsx'
 import Icon from './Icon.tsx'
+import IconButton from './IconButton.tsx'
 import { newId } from '../domain/id.ts'
 import { STEP_WORD } from '../domain/plan.ts'
 import {
@@ -27,7 +28,16 @@ export default function StepList({ steps, kind, onChange }: Props) {
   const replace = (index: number, changes: Partial<TimerStep>) =>
     onChange(steps.map((step, at) => (at === index ? { ...step, ...changes } : step)))
 
+  const move = (index: number, by: 1 | -1) => {
+    const next = [...steps]
+    const [moved] = next.splice(index, 1)
+    if (moved) next.splice(index + by, 0, moved)
+    onChange(next)
+  }
+
   const last = steps[steps.length - 1]
+  // a pyramid is a ladder that walks back down, and its peak is climbed once
+  const mirrored = steps.length * 2 - 1
 
   return (
     <div className={styles.list}>
@@ -35,15 +45,26 @@ export default function StepList({ steps, kind, onChange }: Props) {
         <div key={step.id} className={styles.step}>
           <div className="line">
             <span className="group-label">{`${word.one} ${index + 1}`}</span>
-            <button
-              type="button"
-              className={styles.remove}
-              aria-label={`Retirer ${word.one} ${index + 1}`}
-              disabled={steps.length <= 1}
-              onClick={() => onChange(steps.filter((_, at) => at !== index))}
-            >
-              <Icon name="trash" />
-            </button>
+            <span className={styles.rowActions}>
+              <IconButton
+                icon="up"
+                label={`Monter ${word.one} ${index + 1}`}
+                disabled={index === 0}
+                onClick={() => move(index, -1)}
+              />
+              <IconButton
+                icon="down"
+                label={`Descendre ${word.one} ${index + 1}`}
+                disabled={index === steps.length - 1}
+                onClick={() => move(index, 1)}
+              />
+              <IconButton
+                icon="trash"
+                label={`Retirer ${word.one} ${index + 1}`}
+                disabled={steps.length <= 1}
+                onClick={() => onChange(steps.filter((_, at) => at !== index))}
+              />
+            </span>
           </div>
 
           {named && (
@@ -78,6 +99,24 @@ export default function StepList({ steps, kind, onChange }: Props) {
         <Icon name="plus" />
         {`Ajouter ${word.add}`}
       </Button>
+
+      {kind === 'ladder' && steps.length > 1 && (
+        <Button
+          block
+          disabled={mirrored > STEPS_MAX}
+          onClick={() =>
+            onChange([
+              ...steps,
+              ...steps
+                .slice(0, -1)
+                .reverse()
+                .map((step) => ({ ...step, id: newId() })),
+            ])
+          }
+        >
+          Ajouter la redescente
+        </Button>
+      )}
     </div>
   )
 }

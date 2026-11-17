@@ -2,6 +2,9 @@ import {
   AlarmClock,
   ChevronLeft,
   ChevronRight,
+  Check,
+  ChevronUp,
+  ChevronDown,
   Clock,
   Coffee,
   Copy,
@@ -17,6 +20,7 @@ import {
   TimerReset,
   Trash2,
   TrendingUp,
+  Undo2,
   Zap,
 } from 'lucide-react'
 
@@ -26,6 +30,9 @@ const ICONS = {
   plus: Plus,
   back: ChevronLeft,
   go: ChevronRight,
+  up: ChevronUp,
+  down: ChevronDown,
+  check: Check,
   clock: Clock,
   settings: Settings2,
   copy: Copy,
@@ -41,6 +48,7 @@ const ICONS = {
   loop: Loop,
   list: ListOrdered,
   climb: TrendingUp,
+  undo: Undo2,
 }
 
 export type IconName = keyof typeof ICONS

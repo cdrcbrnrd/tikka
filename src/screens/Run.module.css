@@ -141,14 +141,18 @@
 
 .taps {
   display: flex;
-  align-items: baseline;
-  gap: var(--space-2);
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.tapCount {
   font-size: var(--text-lg);
   color: var(--muted);
 }
 
-.taps > span {
+.tapCount > span {
   font-size: var(--text-xl);
   font-weight: 600;
   color: var(--text);
 }
+

@@ -1,4 +1,4 @@
-export type Cue = 'tick' | 'go' | 'rest' | 'end'
+export type Cue = 'tick' | 'go' | 'rest' | 'block' | 'end'
 
 type Shape = { freq: number; duration: number; gain: number; repeats: number; gap: number }
 
@@ -6,6 +6,8 @@ const SHAPES: Record<Cue, Shape> = {
   tick: { freq: 880, duration: 0.09, gain: 0.25, repeats: 1, gap: 0 },
   go: { freq: 1320, duration: 0.22, gain: 0.4, repeats: 1, gap: 0 },
   rest: { freq: 523, duration: 0.22, gain: 0.3, repeats: 1, gap: 0 },
+  // lower and doubled, because a rest between blocks is long enough to sit down for
+  block: { freq: 392, duration: 0.26, gain: 0.3, repeats: 2, gap: 0.3 },
   end: { freq: 1320, duration: 0.18, gain: 0.4, repeats: 3, gap: 0.26 },
 }
 
@@ -13,6 +15,7 @@ const VIBRATIONS: Record<Cue, number | number[]> = {
   tick: 30,
   go: 120,
   rest: 60,
+  block: [90, 90, 90],
   end: [120, 90, 120, 90, 240],
 }
 

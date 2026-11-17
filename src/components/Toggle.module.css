@@ -1,0 +1,24 @@
+.option {
+  text-align: left;
+  touch-action: manipulation;
+}
+
+.box {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: none;
+  width: 1.75rem;
+  height: 1.75rem;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+  color: var(--on-accent);
+  transition:
+    background var(--transition),
+    border-color var(--transition);
+}
+
+.on {
+  background: var(--accent);
+  border-color: var(--accent);
+}

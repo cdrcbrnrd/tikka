@@ -1,0 +1,25 @@
+.button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: none;
+  width: var(--tap);
+  height: var(--tap);
+  border-radius: 50%;
+  color: var(--muted);
+  transition: background var(--transition);
+  touch-action: manipulation;
+}
+
+.button:active:not(:disabled) {
+  background: var(--surface-active);
+  color: var(--text);
+}
+
+.button:disabled {
+  opacity: 0.3;
+}
+
+.ringed {
+  border: 1px solid var(--line);
+}

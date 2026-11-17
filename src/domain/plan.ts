@@ -1,6 +1,6 @@
 import type { Blocked, Timer } from './timer.ts'
 
-export type SegmentKind = 'prepare' | 'work' | 'rest'
+export type SegmentKind = 'prepare' | 'work' | 'rest' | 'blockRest'
 
 // a null duration runs until the athlete stops it, and only the last segment may be open
 export type Segment = {
@@ -147,6 +147,9 @@ export function expand(plan: Plan): Segment[] {
   for (const [index, block] of plan.blocks.entries()) {
     if (open) break
     const detail = block.label ?? undefined
+    // the option ends a stretch on a rest, so it only applies where no other rest follows it
+    const lastBlock = index === plan.blocks.length - 1
+    const followed = lastBlock ? plan.cooldown > 0 : block.rest > 0
 
     for (let pass = 1; pass <= block.repeat && !open; pass += 1) {
       if (block.counts) round += 1
@@ -172,15 +175,15 @@ export function expand(plan: Plan): Segment[] {
         }
 
         const tail = pass === block.repeat && position === block.steps.length - 1
-        if (step.rest > 0 && (!tail || plan.keepLastRest)) {
+        if (step.rest > 0 && (!tail || (plan.keepLastRest && !followed))) {
           segments.push({ kind: 'rest', label: 'Repos', detail, duration: step.rest, round })
         }
       }
     }
 
     // a block rest only bridges two blocks, so the last one is dead time whatever the option says
-    if (!open && index < plan.blocks.length - 1 && block.rest > 0) {
-      segments.push({ kind: 'rest', label: 'Repos de bloc', detail, duration: block.rest, round })
+    if (!open && !lastBlock && block.rest > 0) {
+      segments.push({ kind: 'blockRest', label: 'Repos de bloc', detail, duration: block.rest, round })
     }
   }
 

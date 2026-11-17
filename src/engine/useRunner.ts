@@ -25,6 +25,7 @@ export type Runner = {
   resume: () => void
   stop: () => void
   lap: () => void
+  undoLap: () => void
 }
 
 // the display only needs tenths, a state change per frame would re-render for nothing
@@ -81,6 +82,12 @@ export function useRunner(timer: Timer): Runner {
     playCue('tick')
     setLaps((current) => [...current, elapsed - segmentStart(elapsed, bounds)])
   }, [bounds])
+
+  const undoLap = useCallback(() => {
+    // the screen only offers it with a lap to drop, and an updater has to stay free of side effects
+    playCue('rest')
+    setLaps((current) => current.slice(0, -1))
+  }, [])
 
   useEffect(() => {
     if (status !== 'running') return
@@ -142,6 +149,7 @@ export function useRunner(timer: Timer): Runner {
     resume,
     stop,
     lap,
+    undoLap,
   }
 }
 

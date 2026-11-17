@@ -1,9 +1,16 @@
 import type { SegmentKind } from '../domain/plan.ts'
-import { playCue } from './cues.ts'
+import { playCue, type Cue } from './cues.ts'
 
 export type CueScheduler = {
   reset: () => void
   tick: (index: number, kind: SegmentKind, remainingMs: number) => void
+}
+
+const CUES: Record<SegmentKind, Cue> = {
+  prepare: 'rest',
+  work: 'go',
+  rest: 'rest',
+  blockRest: 'block',
 }
 
 // one cue per transition and per counted second, so coming back from sleep never fires a burst
@@ -22,7 +29,7 @@ export function createCueScheduler(): CueScheduler {
 
       if (index !== lastSegment) {
         lastSegment = index
-        playCue(kind === 'work' ? 'go' : 'rest')
+        playCue(CUES[kind])
         return
       }
 

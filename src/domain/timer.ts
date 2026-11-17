@@ -1,6 +1,6 @@
 import { clockShort, NBSP, plural } from './format.ts'
 import { newId } from './id.ts'
-import { buildSegments, STEP_WORD, TABATA_REST, TABATA_WORK, type Segment } from './plan.ts'
+import { buildSegments, planOf, STEP_WORD, TABATA_REST, TABATA_WORK, type Segment } from './plan.ts'
 
 export const KINDS = [
   'stopwatch',
@@ -193,6 +193,12 @@ export function describe(timer: Timer): string {
 
 function openEnded(segments: Segment[]): boolean {
   return segments.some((segment) => segment.duration === null)
+}
+
+// the option only shows where it changes something: a rest to keep, and nothing already following
+export function canKeepLastRest(timer: Timer): boolean {
+  if (timer.cooldown > 0) return false
+  return planOf(timer).blocks.some((block) => block.steps.some((step) => step.rest > 0))
 }
 
 // a timer that runs until the athlete stops it: it has no total, and nothing can follow it

@@ -2,6 +2,7 @@ import { useEffect, useRef } from 'react'
 import { Navigate, useNavigate, useParams } from 'react-router-dom'
 import BackLink from '../components/BackLink.tsx'
 import Button from '../components/Button.tsx'
+import IconButton from '../components/IconButton.tsx'
 import ProgressRing from '../components/ProgressRing.tsx'
 import RoundDots from '../components/RoundDots.tsx'
 import { clock, clockTenths, plural, splits } from '../domain/format.ts'
@@ -122,9 +123,19 @@ function Session({ timer }: { timer: Timer }) {
 
           <div className={styles.under}>
             {tapping && (
-              <span className={styles.taps}>
-                <span className="digits">{runner.round}</span> tours
-              </span>
+              <div className={styles.taps}>
+                <span className={styles.tapCount}>
+                  <span className="digits">{runner.round}</span> tours
+                </span>
+                {/* kept in place with nothing to undo, so the count never shifts under the thumb */}
+                <IconButton
+                  icon="undo"
+                  ringed
+                  label="Annuler le dernier tour"
+                  disabled={runner.laps.length === 0}
+                  onClick={runner.undoLap}
+                />
+              </div>
             )}
             <RoundDots round={runner.round} rounds={runner.rounds} />
             {runner.nextSegment && (

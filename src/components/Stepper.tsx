@@ -81,8 +81,9 @@ export default function Stepper({
   }
 
   return (
-    <div className={styles.field}>
-      <span className={styles.label}>{label}</span>
+    <div className="field">
+      {/* the label column is what is left over, and a wrapped label makes its row taller */}
+      <span className="subtle">{label}</span>
       <div className={styles.controls}>
         <button
           type="button"

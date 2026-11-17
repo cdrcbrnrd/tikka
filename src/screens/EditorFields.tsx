@@ -1,8 +1,10 @@
 import Duration from '../components/Duration.tsx'
 import StepList from '../components/StepList.tsx'
 import Stepper from '../components/Stepper.tsx'
+import Toggle from '../components/Toggle.tsx'
 import { clock } from '../domain/format.ts'
 import {
+  canKeepLastRest,
   isOpenEnded,
   MAX_DURATION,
   MIN_DURATION,
@@ -75,6 +77,13 @@ export default function EditorFields({ draft, patch }: Props) {
 
       {'blocks' in draft && (
         <>
+          {canKeepLastRest(draft) && (
+            <Toggle
+              label="Garder le dernier repos"
+              value={draft.keepLastRest}
+              onChange={(keepLastRest) => patch({ keepLastRest })}
+            />
+          )}
           <Stepper label="Blocs" value={draft.blocks} min={1} max={10} {...field('blocks')} />
           {draft.blocks > 1 && (
             <Duration
