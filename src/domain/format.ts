@@ -22,11 +22,14 @@ export function sessionDate(iso: string): string {
   })
 }
 
+// a unit symbol never leaves the number it measures, so the line may not break between them
+export const NBSP = '\u00a0'
+
 export function clockShort(seconds: number): string {
-  if (seconds < 60) return `${seconds} s`
+  if (seconds < 60) return `${seconds}${NBSP}s`
   const minutes = Math.floor(seconds / 60)
   const rest = seconds % 60
-  return rest === 0 ? `${minutes} min` : `${minutes} min ${rest} s`
+  return rest === 0 ? `${minutes}${NBSP}min` : `${minutes}${NBSP}min ${rest}${NBSP}s`
 }
 
 export function plural(count: number, word: string): string {

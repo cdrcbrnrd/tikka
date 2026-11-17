@@ -100,9 +100,5 @@ export default function Home() {
 function Total({ timer }: { timer: Timer }) {
   const total = totalShort(timer)
   if (!total) return null
-  return (
-    <span className={`${styles.total} digits`}>
-      {total.value} {total.unit}
-    </span>
-  )
+  return <span className={`${styles.total} digits`}>{total}</span>
 }
