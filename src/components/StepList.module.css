@@ -1,7 +1,8 @@
 .list {
   display: flex;
   flex-direction: column;
-  gap: var(--space-5);
+  /* the rows of a form are one gutter apart, and a step is a row of the list it sits in */
+  gap: var(--space-2);
 }
 
 .step {
